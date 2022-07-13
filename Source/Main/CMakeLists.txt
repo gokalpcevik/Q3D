@@ -1,1 +1,0 @@
-﻿add_executable("Q3D" Main.cpp)

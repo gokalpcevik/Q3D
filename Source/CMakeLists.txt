@@ -6,7 +6,9 @@ find_package(SDL2 2.0.14 REQUIRED)
 find_package(spdlog REQUIRED)
 find_package(blaze CONFIG REQUIRED)
 
-add_subdirectory ("Main")
+add_executable("Q3D" "Main.cpp")
+
+add_subdirectory ("Core")
 
 set_target_properties("Q3D"
         PROPERTIES
