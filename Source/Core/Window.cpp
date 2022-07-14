@@ -4,49 +4,32 @@ namespace Q3D
 {
 	Window::Window(uint32_t w, uint32_t h, std::string_view title)
 	{
-        m_Window = SDL_CreateWindow(title.data(), 50, 50, w, h, SDL_WINDOW_SHOWN|SDL_WINDOW_RESIZABLE);
-        if(!m_Window)
-        {
-			Q3D_ERROR("Something has gone wrong while creating the SDL window. Error Message:\n {0}",SDL_GetError());
-            return;
-        }
-    }
-    Window::Window(uint32_t x, uint32_t y, uint32_t w, uint32_t h, std::string_view title, uint32_t flags)
-    {
-        m_Window = SDL_CreateWindow(title.data(),x,y,w,h,flags);
-        if(!m_Window)
-        {
+		m_Window = SDL_CreateWindow(title.data(), 50, 50, w, h, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
+		if (!m_Window)
+		{
 			Q3D_ERROR("Something has gone wrong while creating the SDL window. Error Message:\n {0}", SDL_GetError());
-            return;
-        }
-    }
+			return;
+		}
+	}
+
+	Window::Window(uint32_t x, uint32_t y, uint32_t w, uint32_t h, std::string_view title, uint32_t flags)
+	{
+		m_Window = SDL_CreateWindow(title.data(), x, y, w, h, flags);
+		if (!m_Window)
+		{
+			Q3D_ERROR("Something has gone wrong while creating the SDL window. Error Message:\n {0}", SDL_GetError());
+			return;
+		}
+	}
 
 	Window::~Window()
 	{
+		SDL_DestroyRenderer(m_Renderer->m_Renderer);
 		SDL_DestroyWindow(m_Window);
 	}
 
 	auto Window::PollEvents() -> int
 	{
-		switch (m_Event.type)
-		{
-		case SDL_QUIT:
-		{
-			return 0;
-		}
-		case SDL_WINDOWEVENT:
-		{
-			switch (m_Event.window.event)
-			{
-			case SDL_WINDOWEVENT_RESIZED:
-			{
-				
-				break;
-			}
-			}
-		}
-		default: break;
-		}
 		return SDL_PollEvent(&m_Event);
 	}
 
@@ -87,10 +70,21 @@ namespace Q3D
 		return hwnd;
 	}
 
-	auto Window::IsNullPtr() const -> bool
+	auto Window::CreateRenderer(uint32_t flags) -> bool
 	{
-        return m_Window == nullptr;
-    }
+		m_Renderer = std::make_unique<Renderer>(this, flags);
+		return !m_Renderer->IsNull();
+	}
+
+	auto Window::GetRenderer() const -> const std::unique_ptr<Renderer>&
+	{
+		return m_Renderer;
+	}
+
+	auto Window::IsNull() const -> bool
+	{
+		return m_Window == nullptr;
+	}
 
 	void Window::SetTitle(const char* title)
 	{

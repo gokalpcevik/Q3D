@@ -1,5 +1,6 @@
 #pragma once
 #include <SDL2/SDL.h>
+#include <fmt/format.h>
 #include "Log.h"
 #include "Window.h"
 
@@ -34,10 +35,10 @@ namespace Q3D
 		auto Start() -> int32_t;
 	private:
 		auto Update() -> int32_t;
-
+		auto GetRenderer() const -> const std::unique_ptr<Renderer>& { return m_Window->GetRenderer(); }
 	private:
 		AppStats m_Stats{};
 		bool m_Running = true;
-		std::shared_ptr<Window> m_Window;
+		std::unique_ptr<Window> m_Window;
 	};
 }

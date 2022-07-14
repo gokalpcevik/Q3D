@@ -5,10 +5,12 @@ project ("Q3D")
 find_package(SDL2 2.0.14 REQUIRED)
 find_package(spdlog REQUIRED)
 find_package(blaze CONFIG REQUIRED)
+find_package(fmt CONFIG REQUIRED)
 
 add_executable("Q3D" "Main.cpp")
 
 add_subdirectory ("Core")
+add_subdirectory ("Graphics")
 
 set_target_properties("Q3D"
         PROPERTIES
@@ -24,4 +26,5 @@ target_include_directories("Q3D" PRIVATE
 target_link_libraries("Q3D" PRIVATE
     SDL2::SDL2
     spdlog::spdlog
-    blaze::blaze)
+    blaze::blaze
+    fmt::fmt)
