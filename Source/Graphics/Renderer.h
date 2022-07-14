@@ -6,6 +6,11 @@ namespace Q3D
 {
 	class Window;
 
+	struct Rectangle
+	{
+		uint32_t x, y, width, height, color;
+	};
+
 	class Renderer
 	{
 	public:
@@ -15,13 +20,12 @@ namespace Q3D
 		[[nodiscard]] auto IsNull() const -> bool;
 		[[nodiscard]] auto GetSDLRenderer() const -> SDL_Renderer*;
 		void Clear(uint8_t R, uint8_t G, uint8_t B, uint8_t A) const;
-		// Clears the color buffer to black.
 		void ClearColorBuffer(uint32_t color) const;
 		void UpdateColorBuffer() const;
 		void CopyColorBuffer() const;
 		void Present() const;
 		void SetPixel(uint32_t color, uint32_t index) const;
-
+		void DrawRectangle(const Rectangle& rect) const;
 	private:
 		Window* m_Window{nullptr};
 		SDL_Renderer* m_Renderer{nullptr};

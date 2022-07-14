@@ -15,6 +15,7 @@ namespace Q3D
 		m_WindowWidth = pWindow->GetWidth();
 		//Color Format ARGB
 		m_ColorBuffer = new uint32_t[m_WindowWidth * m_WindowHeight];
+		std::uninitialized_fill_n(m_ColorBuffer, m_WindowWidth * m_WindowHeight, 0xFF000000);
 		m_ColorBufferTexture = SDL_CreateTexture(m_Renderer,
 		                                         SDL_PIXELFORMAT_ARGB8888,
 		                                         SDL_TEXTUREACCESS_STREAMING,
@@ -70,6 +71,17 @@ namespace Q3D
 	void Renderer::SetPixel(uint32_t color, uint32_t index) const
 	{
 		m_ColorBuffer[index] = color;
+	}
+
+	void Renderer::DrawRectangle(const Rectangle& rect) const
+	{
+		for(size_t y = rect.y; y < rect.y + rect.height; y++)
+		{
+			for (size_t x = rect.x; x < rect.x + rect.width; x++)
+			{
+				m_ColorBuffer[m_WindowWidth * y + x] = rect.color;
+			}
+		}
 	}
 
 	auto Renderer::GetSDLRenderer() const -> SDL_Renderer*
