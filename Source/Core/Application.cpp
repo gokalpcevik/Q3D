@@ -13,14 +13,13 @@ namespace Q3D
 		Log::Init();
 		SDL_DisplayMode displayMode{};
 		SDL_GetCurrentDisplayMode(0, &displayMode);
-		
 		m_Window = std::make_unique<Window>(
 			SDL_WINDOWPOS_CENTERED,
 			SDL_WINDOWPOS_CENTERED,
-			1280,
-			720,
+			800,
+			600,
 			"Q3D Graphics",
-			SDL_WINDOW_FULLSCREEN_DESKTOP
+			0
 		);
 
 		if (m_Window->IsNull())
@@ -36,6 +35,9 @@ namespace Q3D
 	{
 		while (m_Running)
 		{
+			auto counter = SDL_GetPerformanceCounter();
+			m_Stats.m_FrameTime = counter - m_Stats.m_LastTickCount;
+			m_Stats.m_LastTickCount = counter;
 			while (m_Window->PollEvents())
 			{
 				switch (m_Window->GetEvent().type)
@@ -74,16 +76,15 @@ namespace Q3D
 				}
 			}
 			GetRenderer()->Clear(125, 255, 255, 255);
-			GetRenderer()->ClearColorBuffer(0xFF000000);
-			Rectangle rect{ 100,100,250,175,0xFFFF00FF };
+			GetRenderer()->ClearColorBuffer_Black();
+			Rectangle rect{ 50,50,100,100,0xFF00FFFF };
 			GetRenderer()->DrawRectangle(rect);
 			GetRenderer()->UpdateColorBuffer();
 			GetRenderer()->CopyColorBuffer();
 			GetRenderer()->Present();
-			auto counter = SDL_GetPerformanceCounter();
-			m_Stats.m_FrameTime = counter - m_Stats.m_LastTickCount;
-			m_Stats.m_LastTickCount = counter;
+			
 		}
+		GetRenderer()->Shutdown();
 		SDL_Quit();
 		return 0;
 	}

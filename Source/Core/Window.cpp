@@ -24,7 +24,6 @@ namespace Q3D
 
 	Window::~Window()
 	{
-		SDL_DestroyRenderer(m_Renderer->m_Renderer);
 		SDL_DestroyWindow(m_Window);
 	}
 

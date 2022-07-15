@@ -23,13 +23,6 @@ namespace Q3D
 		                                         m_WindowHeight);
 	}
 
-	Renderer::~Renderer()
-	{
-		// Destruction of the member SDL_Renderer object is taken care by the associated Window class
-		// so we do not destroy the SDL_Renderer in this destructor.
-		delete[] m_ColorBuffer;
-	}
-
 	auto Renderer::IsNull() const -> bool
 	{
 		return !m_Renderer;
@@ -45,9 +38,14 @@ namespace Q3D
 	void Renderer::ClearColorBuffer(uint32_t color) const
 	{
 		// This is a bit slow for debug builds but the compiler takes care of the optimization in the release build.
-		// Also we could do this with a for loop(nested or not, also unroll it etc.) but the performance is nearly the same both in debug
+		// Also we could do this with a for loop(nested or not, also unroll it etc.) but the performance of the two is nearly the same both in debug
 		// and release builds. 
 		std::fill_n(m_ColorBuffer, m_WindowWidth * m_WindowHeight, color);
+	}
+
+	void Renderer::ClearColorBuffer_Black() const
+	{
+		std::memset(m_ColorBuffer, 0,GetColorBufferByteWidth());
 	}
 
 	void Renderer::UpdateColorBuffer() const
@@ -68,9 +66,14 @@ namespace Q3D
 		SDL_RenderPresent(m_Renderer);
 	}
 
-	void Renderer::SetPixel(uint32_t color, uint32_t index) const
+	void Renderer::DrawPixel(uint32_t index, uint32_t color) const
 	{
 		m_ColorBuffer[index] = color;
+	}
+
+	void Renderer::DrawPixel(uint32_t x, uint32_t y, uint32_t color) const
+	{
+		m_ColorBuffer[m_WindowWidth * y + x] = color;
 	}
 
 	void Renderer::DrawRectangle(const Rectangle& rect) const
@@ -84,8 +87,35 @@ namespace Q3D
 		}
 	}
 
+	void Renderer::Shutdown() const
+	{
+		delete[] m_ColorBuffer;
+		SDL_DestroyTexture(m_ColorBufferTexture);
+		SDL_DestroyRenderer(m_Renderer);
+	}
+
 	auto Renderer::GetSDLRenderer() const -> SDL_Renderer*
 	{
 		return m_Renderer;
+	}
+
+	auto Renderer::GetColorBuffer() const -> uint32_t*
+	{
+		return m_ColorBuffer;
+	}
+
+	auto Renderer::GetColorBufferSize() const -> size_t
+	{
+		return (size_t)m_WindowHeight * m_WindowWidth;
+	}
+
+	auto Renderer::GetColorBufferByteWidth() const -> size_t
+	{
+		return (size_t)m_WindowHeight * m_WindowWidth * sizeof(uint32_t);
+	}
+
+	auto Renderer::GetColorBufferTexture() const -> SDL_Texture*
+	{
+		return m_ColorBufferTexture;
 	}
 }
