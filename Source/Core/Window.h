@@ -27,7 +27,7 @@ namespace Q3D
 		auto CreateRenderer(uint32_t flags) -> bool;
 		[[nodiscard]] auto GetRenderer() const -> const std::unique_ptr<Renderer>&;
 
-		void SetTitle(const char* title);
+		void SetTitle(const char* title) const;
 
 	private:
 		SDL_Window* m_Window = nullptr;

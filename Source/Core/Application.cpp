@@ -11,8 +11,6 @@ namespace Q3D
 	auto Application::Start() -> int32_t
 	{
 		Log::Init();
-		SDL_DisplayMode displayMode{};
-		SDL_GetCurrentDisplayMode(0, &displayMode);
 		m_Window = std::make_unique<Window>(
 			SDL_WINDOWPOS_CENTERED,
 			SDL_WINDOWPOS_CENTERED,
@@ -75,14 +73,10 @@ namespace Q3D
 					}
 				}
 			}
-			GetRenderer()->Clear(125, 255, 255, 255);
 			GetRenderer()->ClearColorBuffer_Black();
-			Rectangle rect{ 50,50,100,100,0xFF00FFFF };
-			GetRenderer()->DrawRectangle(rect);
 			GetRenderer()->UpdateColorBuffer();
 			GetRenderer()->CopyColorBuffer();
 			GetRenderer()->Present();
-			
 		}
 		GetRenderer()->Shutdown();
 		SDL_Quit();

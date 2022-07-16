@@ -85,7 +85,7 @@ namespace Q3D
 		return m_Window == nullptr;
 	}
 
-	void Window::SetTitle(const char* title)
+	void Window::SetTitle(const char* title) const
 	{
 		SDL_SetWindowTitle(m_Window, title);
 	}

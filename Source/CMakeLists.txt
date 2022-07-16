@@ -4,7 +4,7 @@ project ("Q3D")
 
 find_package(SDL2 2.0.14 REQUIRED)
 find_package(spdlog REQUIRED)
-find_package(blaze CONFIG REQUIRED)
+find_package(Eigen3 CONFIG REQUIRED)
 find_package(fmt CONFIG REQUIRED)
 
 add_executable("Q3D" "Main.cpp")
@@ -14,7 +14,7 @@ add_subdirectory ("Graphics")
 
 set_target_properties("Q3D"
         PROPERTIES
-        ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+        ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/archive"
         LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
         CXX_STANDARD 17)
@@ -26,5 +26,5 @@ target_include_directories("Q3D" PRIVATE
 target_link_libraries("Q3D" PRIVATE
     SDL2::SDL2
     spdlog::spdlog
-    blaze::blaze
+    Eigen3::Eigen
     fmt::fmt)
