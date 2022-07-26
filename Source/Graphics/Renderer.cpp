@@ -68,16 +68,19 @@ namespace Q3D
 
 	void Renderer::DrawPixel(uint32_t index, uint32_t color) const
 	{
+		assert(GetColorBufferSize() >= index);
 		m_ColorBuffer[index] = color;
 	}
 
 	void Renderer::DrawPixel(uint32_t x, uint32_t y, uint32_t color) const
 	{
+		assert((m_WindowWidth >= x) && (m_WindowHeight >= y));
 		m_ColorBuffer[m_WindowWidth * y + x] = color;
 	}
 
 	void Renderer::DrawRectangle(const Rectangle& rect) const
 	{
+		assert((m_WindowWidth >= rect.x + rect.width) && (m_WindowHeight >= rect.y + rect.height));
 		for(size_t y = rect.y; y < rect.y + rect.height; y++)
 		{
 			for (size_t x = rect.x; x < rect.x + rect.width; x++)
@@ -92,6 +95,12 @@ namespace Q3D
 		delete[] m_ColorBuffer;
 		SDL_DestroyTexture(m_ColorBufferTexture);
 		SDL_DestroyRenderer(m_Renderer);
+	}
+
+	auto Renderer::Project(const Vector3f& pos) -> Vector2f
+	{
+		// This is essentially a very hacky way of doing perspective
+		return Vector2f{ pos[0] * 640.0f / pos[2] , pos[1] * 640.0f / pos[2] };
 	}
 
 	auto Renderer::GetSDLRenderer() const -> SDL_Renderer*

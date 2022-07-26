@@ -11,6 +11,7 @@ add_executable("Q3D" "Main.cpp")
 
 add_subdirectory ("Core")
 add_subdirectory ("Graphics")
+add_subdirectory ("Math")
 
 set_target_properties("Q3D"
         PROPERTIES

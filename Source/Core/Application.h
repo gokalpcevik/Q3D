@@ -4,9 +4,11 @@
 #include <vector>
 #include "Log.h"
 #include "Window.h"
+#include "../Math/VectorTransform.h"
 
 namespace Q3D
 {
+	using Eigen::Vector3f;
 	struct AppStats
 	{
 		Uint64 m_LastTickCount = 0;
@@ -28,6 +30,9 @@ namespace Q3D
 		}
 	};
 
+	static constexpr size_t CLOUD_DIM = 9;
+	static constexpr size_t POINT_COUNT = CLOUD_DIM * CLOUD_DIM * CLOUD_DIM;
+
 	class Application
 	{
 	public:
@@ -37,9 +42,18 @@ namespace Q3D
 	private:
 		auto Update() -> int32_t;
 		auto GetRenderer() const -> const std::unique_ptr<Renderer>& { return m_Window->GetRenderer(); }
+
+		// Transforms the points and projects them.
+		void Transform_Project();
+		// Renders/draws the projected points.
+		void RenderPoints();
 	private:
 		AppStats m_Stats{};
 		bool m_Running = true;
 		std::unique_ptr<Window> m_Window;
+		std::array<Vector3f, POINT_COUNT> m_PointCloud = {};
+		std::array<Vector2f,POINT_COUNT> m_ProjectedPoints = {};
+		uint32_t m_WindowW = 1920;
+		uint32_t m_WindowH = 1080;
 	};
 }

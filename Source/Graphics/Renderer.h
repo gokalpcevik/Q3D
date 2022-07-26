@@ -1,10 +1,13 @@
 #pragma once
 #include <SDL2/SDL.h>
+#include <Eigen/Eigen>
 #include <cstdint>
 
 namespace Q3D
 {
 	class Window;
+	using Eigen::Vector3f;
+	using Eigen::Vector2f;
 
 	struct Rectangle
 	{
@@ -26,7 +29,7 @@ namespace Q3D
 		void Clear(uint8_t R, uint8_t G, uint8_t B, uint8_t A) const;
 		void ClearColorBuffer(uint32_t color) const;
 		// This sets the entire color buffer to zero(black) and is significantly faster
-		// than setting a spesific color value.
+		// than setting a specific color value.
 		void ClearColorBuffer_Black() const;
 		void UpdateColorBuffer() const;
 		void CopyColorBuffer() const;
@@ -35,15 +38,16 @@ namespace Q3D
 		void DrawPixel(uint32_t x,uint32_t y, uint32_t color) const;
 		void DrawRectangle(const Rectangle& rect) const;
 		void Shutdown() const;
+
+		static auto Project(const Vector3f& pos) -> Vector2f;
 	private:
 		Window* m_Window{nullptr};
 		SDL_Renderer* m_Renderer{nullptr};
-		//It might be a better idea to use a std::vector here.
 		uint32_t* m_ColorBuffer{nullptr};
 		SDL_Texture* m_ColorBufferTexture{nullptr};
 
-		uint32_t m_WindowWidth = 1280;
-		uint32_t m_WindowHeight = 720;
+		uint32_t m_WindowWidth = 1920;
+		uint32_t m_WindowHeight = 1080;
 		
 		friend class Window;
 	};
