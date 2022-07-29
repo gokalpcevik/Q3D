@@ -13,19 +13,19 @@ namespace Q3D
 		Log::Init();
 		SDL_DisplayMode disp{};
 		SDL_GetDisplayMode(0, 0, &disp);
-		m_WindowH = disp.h;
-		m_WindowW = disp.w;
+		m_WindowW = 1600;
+		m_WindowH = 900;
 		m_Window = std::make_unique<Window>(
 			SDL_WINDOWPOS_CENTERED,
 			SDL_WINDOWPOS_CENTERED,
-			disp.w,
-			disp.h,
+			m_WindowW,
+			m_WindowH,
 			"Q3D Graphics",
-			SDL_WINDOW_FULLSCREEN_DESKTOP
+			0
 		);
 		if (m_Window->IsNull())
 			return 0;
-
+		SDL_SetHint(SDL_HINT_RENDER_VSYNC, "1");
 		if (!m_Window->CreateRenderer(0))
 			return 0;
 
@@ -45,7 +45,7 @@ namespace Q3D
 	{
 		while (m_Running)
 		{
-			auto counter = SDL_GetPerformanceCounter();
+			auto const counter = SDL_GetPerformanceCounter();
 			m_Stats.m_FrameTime = counter - m_Stats.m_LastTickCount;
 			m_Stats.m_LastTickCount = counter;
 			while (m_Window->PollEvents())
@@ -81,14 +81,13 @@ namespace Q3D
 						else if (m_Window->GetEvent().key.keysym.sym == SDLK_F1)
 						{
 							Q3D_INFO("FPS: {0:.2f}", m_Stats.GetFramesPerSecond());
+							Q3D_INFO("Frame Time: {0:.2f}ms", m_Stats.GetFrameTime());
+							Q3D_INFO("Frame Time: {0:.8f}s", m_Stats.GetFrameTimeSeconds());
 						}
 					}
 				}
 			}
-			Transform_Project();
-
-
-
+			Transform_Project(m_Stats.GetFrameTime());
 			GetRenderer()->ClearColorBuffer_Black();
 			//-------------------------------------------------
 			RenderPoints();
@@ -102,14 +101,17 @@ namespace Q3D
 		return 0;
 	}
 
-	void Application::Transform_Project()
+	void Application::Transform_Project(float ts)
 	{
+		// Skip the first frames because for some reason the time step is huge.
+		if (ts >= 10.0f)
+			return;
+		static float rot = 0.0f;
+		rot += ts / 2000.0f;
 		for (size_t i = 0; i < POINT_COUNT; i++)
 		{
 			auto v = m_PointCloud[i];
 			
-			static float rot = 0.0f;
-			rot += 0.000005f;
 			v = Math::RotateY(v, rot);
 			v = Math::RotateZ(v, rot);
 			v = Math::RotateX(v, rot);
@@ -120,12 +122,12 @@ namespace Q3D
 		}
 	}
 
-	void Application::RenderPoints()
+	void Application::RenderPoints() const
 	{
-		std::for_each(m_ProjectedPoints.begin()
-			, m_ProjectedPoints.end()
-			, [&](Vector2f v) 
-			{ Rectangle rect{ (uint32_t)v[0] + m_WindowW / 2,(uint32_t)v[1] + m_WindowH / 2,6,6,0xFFFFFF0F };
-		GetRenderer()->DrawRectangle(rect); });
+		for (auto v : m_ProjectedPoints)
+		{
+			Rectangle rect{ (uint32_t)v[0] + m_WindowW / 2,(uint32_t)v[1] + m_WindowH / 2,6,6,0xFFFFFF0F };
+			GetRenderer()->DrawRectangle(rect);
+		}
 	}
 }

@@ -44,9 +44,9 @@ namespace Q3D
 		auto GetRenderer() const -> const std::unique_ptr<Renderer>& { return m_Window->GetRenderer(); }
 
 		// Transforms the points and projects them.
-		void Transform_Project();
+		void Transform_Project(float ts);
 		// Renders/draws the projected points.
-		void RenderPoints();
+		void RenderPoints() const;
 	private:
 		AppStats m_Stats{};
 		bool m_Running = true;
