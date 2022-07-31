@@ -13,8 +13,8 @@ namespace Q3D
 		Log::Init();
 		SDL_DisplayMode disp{};
 		SDL_GetDisplayMode(0, 0, &disp);
-		m_WindowW = 1600;
-		m_WindowH = 900;
+		m_WindowW = 1600U;
+		m_WindowH = 900U;
 		m_Window = std::make_unique<Window>(
 			SDL_WINDOWPOS_CENTERED,
 			SDL_WINDOWPOS_CENTERED,
@@ -25,19 +25,37 @@ namespace Q3D
 		);
 		if (m_Window->IsNull())
 			return 0;
-		SDL_SetHint(SDL_HINT_RENDER_VSYNC, "1");
-		if (!m_Window->CreateRenderer(0))
+		if (!m_Window->CreateRenderer(SDL_RENDERER_PRESENTVSYNC))
 			return 0;
 
+
+		m_MeshVertices =
 		{
-			size_t iPoint = 0;
-			for (float x = -1.0f; x <= 1.0f; x += 0.25f)
-				for (float y = -1.0f; y <= 1.0f; y += 0.25f)
-					for (float z = -1.0f; z <= 1.0f; z += 0.25f)
-						m_PointCloud[iPoint++] = Vector3f(x, y, z);
-		}
+			Vector3f{-1.0f, -1.0f, -1.0f},
+			Vector3f{-1.0f, 1.0f, -1.0f},
+			Vector3f{1.0f, 1.0f, -1.0f},
+			Vector3f{1.0f, -1.0f, -1.0f},
+			Vector3f{1.0f, 1.0f, 1.0f},
+			Vector3f{1.0f, -1.0f, 1.0f}, 
+			Vector3f{-1.0f, 1.0f, 1.0f},
+			Vector3f{-1.0f, -1.0f, 1.0f}
+		};
 
-
+		m_MeshFaces =
+		{
+			Vector3i{1, 2, 3},
+			Vector3i{1, 3, 4},
+			Vector3i{4, 3, 5},
+			Vector3i{4, 5, 6},
+			Vector3i{6, 5, 7},
+			Vector3i{6, 7, 8},
+			Vector3i{8, 7, 2},
+			Vector3i{8, 2, 1},
+			Vector3i{2, 7, 5},
+			Vector3i{2, 5, 3},
+			Vector3i{6, 8, 1},
+			Vector3i{6, 1, 4}
+		};
 		return Update();
 	}
 
@@ -66,8 +84,6 @@ namespace Q3D
 								         m_Window->GetEvent().window.data2);
 								break;
 							}
-
-
 						default: break;
 						}
 					}
@@ -78,19 +94,19 @@ namespace Q3D
 							m_Running = false;
 							break;
 						}
-						else if (m_Window->GetEvent().key.keysym.sym == SDLK_F1)
+						if (m_Window->GetEvent().key.keysym.sym == SDLK_F1)
 						{
 							Q3D_INFO("FPS: {0:.2f}", m_Stats.GetFramesPerSecond());
 							Q3D_INFO("Frame Time: {0:.2f}ms", m_Stats.GetFrameTime());
-							Q3D_INFO("Frame Time: {0:.8f}s", m_Stats.GetFrameTimeSeconds());
+							break;
 						}
 					}
 				}
 			}
-			Transform_Project(m_Stats.GetFrameTime());
 			GetRenderer()->ClearColorBuffer_Black();
 			//-------------------------------------------------
-			RenderPoints();
+			Transform_Project(m_Stats.GetFrameTime());
+			DrawTriangles();
 			//-------------------------------------------------
 			GetRenderer()->UpdateColorBuffer();
 			GetRenderer()->CopyColorBuffer();
@@ -103,31 +119,42 @@ namespace Q3D
 
 	void Application::Transform_Project(float ts)
 	{
-		// Skip the first frames because for some reason the time step is huge.
 		if (ts >= 10.0f)
 			return;
 		static float rot = 0.0f;
 		rot += ts / 2000.0f;
-		for (size_t i = 0; i < POINT_COUNT; i++)
+		for(size_t i = 0; i < m_MeshFaces.size(); ++i)
 		{
-			auto v = m_PointCloud[i];
-			
-			v = Math::RotateY(v, rot);
-			v = Math::RotateZ(v, rot);
-			v = Math::RotateX(v, rot);
-			// Move the camera 3.0 points behind so we can see our points but more importantly,
-			// avoid division by 0.0f which we do not handle at the moment
-			v[2] -= 3.0f;
-			m_ProjectedPoints[i] = Renderer::Project(v);
+			Vector3i face = m_MeshFaces[i];
+
+			std::array<Vector3f, 3ULL> faceVertices{};
+			faceVertices[0] = m_MeshVertices[face[0] - 1];
+			faceVertices[1] = m_MeshVertices[face[1] - 1];
+			faceVertices[2] = m_MeshVertices[face[2] - 1];
+
+			for(size_t j = 0; j < faceVertices.size(); ++j)
+			{
+				Vector3f v = faceVertices[j];
+				v = Math::RotateY(v, rot);
+
+				v[2] -= 3.0f;
+				Vector2f projected = Renderer::Project(v);
+
+				projected[0] += (float)m_WindowW / 2.0f;
+				projected[1] += (float)m_WindowH / 2.0f;
+
+				m_Triangles[i].points[j] = projected;
+			}
 		}
 	}
 
-	void Application::RenderPoints() const
+	void Application::DrawTriangles() const
 	{
-		for (auto v : m_ProjectedPoints)
+		for(auto t : m_Triangles)
 		{
-			Rectangle rect{ (uint32_t)v[0] + m_WindowW / 2,(uint32_t)v[1] + m_WindowH / 2,6,6,0xFFFFFF0F };
-			GetRenderer()->DrawRectangle(rect);
+			GetRenderer()->DrawLine(t.points[0][0], t.points[0][1], t.points[1][0], t.points[1][1], 0xFFFF0000);
+			GetRenderer()->DrawLine(t.points[1][0], t.points[1][1], t.points[2][0], t.points[2][1], 0xFFFF0000);
+			GetRenderer()->DrawLine(t.points[2][0], t.points[2][1], t.points[0][0], t.points[0][1], 0xFFFF0000);
 		}
 	}
 }

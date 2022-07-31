@@ -14,6 +14,11 @@ namespace Q3D
 		uint32_t x, y, width, height, color;
 	};
 
+	struct Triangle
+	{
+		std::array<Vector2f, 3ULL> points{};
+	};
+
 	class Renderer
 	{
 	public:
@@ -37,6 +42,7 @@ namespace Q3D
 		void DrawPixel(uint32_t index,uint32_t color) const;
 		void DrawPixel(uint32_t x,uint32_t y, uint32_t color) const;
 		void DrawRectangle(const Rectangle& rect) const;
+		void DrawLine(uint32_t x0, uint32_t y0, uint32_t x1, uint32_t y1,uint32_t color) const;
 		void Shutdown() const;
 
 		static auto Project(const Vector3f& pos) -> Vector2f;

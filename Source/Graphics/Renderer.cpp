@@ -68,25 +68,48 @@ namespace Q3D
 
 	void Renderer::DrawPixel(uint32_t index, uint32_t color) const
 	{
-		assert(GetColorBufferSize() >= index);
+		if (GetColorBufferSize() <= index) return;
 		m_ColorBuffer[index] = color;
 	}
 
 	void Renderer::DrawPixel(uint32_t x, uint32_t y, uint32_t color) const
 	{
-		assert((m_WindowWidth >= x) && (m_WindowHeight >= y));
+		if ((m_WindowWidth <= x) || (m_WindowHeight <= y)) return;
 		m_ColorBuffer[m_WindowWidth * y + x] = color;
 	}
 
 	void Renderer::DrawRectangle(const Rectangle& rect) const
 	{
-		assert((m_WindowWidth >= rect.x + rect.width) && (m_WindowHeight >= rect.y + rect.height));
+		if ((m_WindowWidth <= rect.x + rect.width) || (m_WindowHeight <= rect.y + rect.height))
+			return;
 		for(size_t y = rect.y; y < rect.y + rect.height; y++)
 		{
 			for (size_t x = rect.x; x < rect.x + rect.width; x++)
 			{
 				m_ColorBuffer[m_WindowWidth * y + x] = rect.color;
 			}
+		}
+	}
+
+	void Renderer::DrawLine(uint32_t x0, uint32_t y0, uint32_t x1, uint32_t y1, uint32_t color) const
+	{
+		int32_t dx = (x1 - x0);
+		int32_t dy = (y1 - y0);
+
+		uint32_t steps = 
+			std::abs(dx) > std::abs(dy) ?
+			std::abs(dx) : std::abs(dy);
+		
+		float Xinc = dx / (float)steps;
+		float Yinc = dy / (float)steps;
+		float x = (float)x0;
+		float y = (float)y0;
+
+		for(uint32_t i = 0; i <= steps; ++i)
+		{
+			DrawPixel(std::lround(x), std::lround(y), color);
+			x += Xinc;
+			y += Yinc;
 		}
 	}
 

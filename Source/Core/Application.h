@@ -9,10 +9,12 @@
 namespace Q3D
 {
 	using Eigen::Vector3f;
+	using Eigen::Vector3i;
+
 	struct AppStats
 	{
-		Uint64 m_LastTickCount = 0;
-		Uint64 m_FrameTime = 0;
+		Uint64 m_LastTickCount = 0U;
+		Uint64 m_FrameTime = 0U;
 
 		auto GetFramesPerSecond() const -> float
 		{
@@ -30,9 +32,6 @@ namespace Q3D
 		}
 	};
 
-	static constexpr size_t CLOUD_DIM = 9;
-	static constexpr size_t POINT_COUNT = CLOUD_DIM * CLOUD_DIM * CLOUD_DIM;
-
 	class Application
 	{
 	public:
@@ -45,15 +44,16 @@ namespace Q3D
 
 		// Transforms the points and projects them.
 		void Transform_Project(float ts);
-		// Renders/draws the projected points.
-		void RenderPoints() const;
+		void DrawTriangles() const;
 	private:
 		AppStats m_Stats{};
 		bool m_Running = true;
 		std::unique_ptr<Window> m_Window;
-		std::array<Vector3f, POINT_COUNT> m_PointCloud = {};
-		std::array<Vector2f,POINT_COUNT> m_ProjectedPoints = {};
-		uint32_t m_WindowW = 1920;
-		uint32_t m_WindowH = 1080;
+		uint32_t m_WindowW = 1920U;
+		uint32_t m_WindowH = 1080U;
+
+		std::array<Vector3f, 8ULL> m_MeshVertices{};
+		std::array<Vector3i, 6ULL * 2ULL> m_MeshFaces{};
+		std::array<Triangle, 6ULL * 2ULL> m_Triangles{};
 	};
-}
+;}
