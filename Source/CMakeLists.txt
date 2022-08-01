@@ -6,6 +6,7 @@ find_package(SDL2 2.0.14 REQUIRED)
 find_package(spdlog REQUIRED)
 find_package(Eigen3 CONFIG REQUIRED)
 find_package(fmt CONFIG REQUIRED)
+find_package(assimp CONFIG REQUIRED)
 
 add_executable("Q3D" "Main.cpp")
 
@@ -28,4 +29,5 @@ target_link_libraries("Q3D" PRIVATE
     SDL2::SDL2
     spdlog::spdlog
     Eigen3::Eigen
-    fmt::fmt)
+    fmt::fmt
+    assimp::assimp)

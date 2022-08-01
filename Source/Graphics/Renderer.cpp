@@ -93,6 +93,41 @@ namespace Q3D
 			}
 		}
 
+		void Renderer::DrawTriangle(const Vector2f& v0, const Vector2f& v1, const Vector2f& v2, uint32_t color) const
+		{
+			DrawLine(v0[0], v0[1], v1[0], v1[1], color);
+			DrawLine(v1[0], v1[1], v2[0], v2[1], color);
+			DrawLine(v2[0], v2[1], v0[0], v0[1], color);
+		}
+
+		void Renderer::DrawMesh(const Mesh& mesh,const Vector3f& cameraPos, uint32_t color) const
+		{
+			for(size_t i = 0; i < mesh.m_Faces.size(); ++i)
+			{
+				Face const& face = mesh.m_Faces[i];
+				Vector3f v0 = mesh.m_Vertices[face.i0 - 1].Position;
+				Vector3f v1 = mesh.m_Vertices[face.i1 - 1].Position;
+				Vector3f v2 = mesh.m_Vertices[face.i2 - 1].Position;
+
+				v0 -= cameraPos;
+				v1 -= cameraPos;
+				v2 -= cameraPos;
+
+				Vector2f p0 = Project(v0);
+				Vector2f p1 = Project(v1);
+				Vector2f p2 = Project(v2);
+
+				p0[0] += (float)m_WindowWidth / 2.0f;
+				p0[1] += (float)m_WindowHeight / 2.0f;
+				p1[0] += (float)m_WindowWidth / 2.0f;
+				p1[1] += (float)m_WindowHeight / 2.0f;
+				p2[0] += (float)m_WindowWidth / 2.0f;
+				p2[1] += (float)m_WindowHeight / 2.0f;
+
+				DrawTriangle(p0, p1, p2,color);
+			}
+		}
+
 		void Renderer::DrawLine(uint32_t x0, uint32_t y0, uint32_t x1, uint32_t y1, uint32_t color) const
 		{
 			int32_t dx = (x1 - x0);
@@ -125,7 +160,7 @@ namespace Q3D
 		auto Renderer::Project(const Vector3f& pos) -> Vector2f
 		{
 			// This is essentially a very hacky way of doing perspective
-			return Vector2f{ pos[0] * 640.0f / pos[2] , pos[1] * 640.0f / pos[2] };
+			return Vector2f{ pos[0] * 640.0f / pos[2] , pos[1] * 640.0f / pos[2]};
 		}
 
 		auto Renderer::GetSDLRenderer() const -> SDL_Renderer*

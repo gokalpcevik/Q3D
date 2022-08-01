@@ -1,2 +1,3 @@
 target_sources("Q3D" PRIVATE 
-	"Renderer.cpp")
+	"Renderer.cpp"
+	"MeshImporter.cpp")

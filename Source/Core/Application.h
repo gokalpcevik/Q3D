@@ -34,9 +34,6 @@ namespace Q3D
 			auto Update()->int32_t;
 			[[nodiscard]] auto GetRenderer() const -> const std::unique_ptr<Graphics::Renderer>& { return m_Window->GetRenderer(); }
 
-			// Transforms the points and projects them.
-			void Transform_Project(float ts);
-			void DrawTriangles() const;
 		private:
 			AppStats m_Stats{};
 			bool m_Running = true;
@@ -44,9 +41,9 @@ namespace Q3D
 			uint32_t m_WindowW = 1920U;
 			uint32_t m_WindowH = 1080U;
 
-			std::array<Vector3f, 8ULL> m_MeshVertices{};
-			std::array<Vector3i, 6ULL * 2ULL> m_MeshFaces{};
-			std::array<Graphics::Triangle, 6ULL * 2ULL> m_Triangles{};
+			std::vector<Graphics::Vertex> m_MeshVertices{};
+			std::vector<Graphics::Face> m_MeshFaces{};
+			Graphics::Mesh m_Cube{};
 		};
 	}
 }

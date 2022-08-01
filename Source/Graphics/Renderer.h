@@ -2,6 +2,7 @@
 #include <SDL2/SDL.h>
 #include <Eigen/Eigen>
 #include <cstdint>
+#include "Types.h"
 
 namespace Q3D
 {
@@ -14,16 +15,6 @@ namespace Q3D
 	{
 		using Eigen::Vector3f;
 		using Eigen::Vector2f;
-
-		struct Rectangle
-		{
-			uint32_t x, y, width, height, color;
-		};
-
-		struct Triangle
-		{
-			std::array<Vector2f, 3ULL> points{};
-		};
 
 		class Renderer
 		{
@@ -48,6 +39,8 @@ namespace Q3D
 			void DrawPixel(uint32_t index, uint32_t color) const;
 			void DrawPixel(uint32_t x, uint32_t y, uint32_t color) const;
 			void DrawRectangle(const Rectangle& rect) const;
+			void DrawTriangle(const Vector2f& v0, const Vector2f& v1, const Vector2f& v2,uint32_t color) const;
+			void DrawMesh(const Mesh& mesh,const Vector3f& cameraPos,uint32_t color) const;
 			void DrawLine(uint32_t x0, uint32_t y0, uint32_t x1, uint32_t y1, uint32_t color) const;
 			void Shutdown() const;
 
