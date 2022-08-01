@@ -7,21 +7,23 @@
 
 namespace Q3D
 {
-    class Log
-    {
-    private:
-        static std::shared_ptr<spdlog::logger> s_Logger;    
-    public:
-        Log() = default;
-        static void Init();
-        static auto GetLogger() -> std::shared_ptr<spdlog::logger>& { return s_Logger; }
-    };   
-   
-} // namespace Era
+  namespace Core
+  {
+      class Log
+      {
+      private:
+          static std::shared_ptr<spdlog::logger> s_Logger;
+      public:
+          Log() = default;
+          static void Init();
+          static auto GetLogger() -> std::shared_ptr<spdlog::logger>& { return s_Logger; }
+      };
+  }
+} 
 
-#define Q3D_TRACE(...)    ::Q3D::Log::GetLogger()->trace(__VA_ARGS__)
-#define Q3D_DEBUG(...)    ::Q3D::Log::GetLogger()->debug(__VA_ARGS__)
-#define Q3D_INFO(...)     ::Q3D::Log::GetLogger()->info(__VA_ARGS__)
-#define Q3D_WARN(...)     ::Q3D::Log::GetLogger()->warn(__VA_ARGS__)
-#define Q3D_ERROR(...)    ::Q3D::Log::GetLogger()->error(__VA_ARGS__)
-#define Q3D_CRITICAL(...) ::Q3D::Log::GetLogger()->critical(__VA_ARGS__)
+#define Q3D_TRACE(...)    ::Q3D::Core::Log::GetLogger()->trace(__VA_ARGS__)
+#define Q3D_DEBUG(...)    ::Q3D::Core::Log::GetLogger()->debug(__VA_ARGS__)
+#define Q3D_INFO(...)     ::Q3D::Core::Log::GetLogger()->info(__VA_ARGS__)
+#define Q3D_WARN(...)     ::Q3D::Core::Log::GetLogger()->warn(__VA_ARGS__)
+#define Q3D_ERROR(...)    ::Q3D::Core::Log::GetLogger()->error(__VA_ARGS__)
+#define Q3D_CRITICAL(...) ::Q3D::Core::Log::GetLogger()->critical(__VA_ARGS__)

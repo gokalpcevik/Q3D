@@ -10,5 +10,5 @@ auto main(int argc, char** argv) -> int
 	{
 		std::cout << SDL_GetError() << std::endl;
 	}
-	return Q3D::Application::Get().Start();
+	return Q3D::Core::Application::Get().Start();
 }

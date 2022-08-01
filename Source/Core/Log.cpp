@@ -2,21 +2,23 @@
 
 namespace Q3D
 {
-    std::shared_ptr<spdlog::logger> Log::s_Logger;
-
-    void Log::Init()
+    namespace Core
     {
-        std::vector<spdlog::sink_ptr> logSinks;
-		logSinks.emplace_back(std::make_shared<spdlog::sinks::stdout_color_sink_mt>());
-		logSinks.emplace_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>("Q3D.log", true));
+		std::shared_ptr<spdlog::logger> Log::s_Logger;
 
-		logSinks[0]->set_pattern("%^[%T] %n: %v%$");
-		logSinks[1]->set_pattern("[%T] [%l] %n: %v");
+		void Log::Init()
+		{
+			std::vector<spdlog::sink_ptr> logSinks;
+			logSinks.emplace_back(std::make_shared<spdlog::sinks::stdout_color_sink_mt>());
+			logSinks.emplace_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>("Q3D.log", true));
 
-		s_Logger = std::make_shared<spdlog::logger>("Q3D", std::begin(logSinks), std::end(logSinks));
-		spdlog::register_logger(s_Logger);
-		s_Logger->set_level(spdlog::level::trace);
-		s_Logger->flush_on(spdlog::level::trace);
+			logSinks[0]->set_pattern("%^[%T] %n: %v%$");
+			logSinks[1]->set_pattern("[%T] [%l] %n: %v");
+
+			s_Logger = std::make_shared<spdlog::logger>("Q3D", std::begin(logSinks), std::end(logSinks));
+			spdlog::register_logger(s_Logger);
+			s_Logger->set_level(spdlog::level::trace);
+			s_Logger->flush_on(spdlog::level::trace);
+		}
     }
-
-} // namespace Era
+}
