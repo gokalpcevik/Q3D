@@ -41,8 +41,8 @@ namespace Q3D
 
 		struct Mesh
 		{
-			std::vector<Vertex> m_Vertices{};
-			std::vector<Face> m_Faces{};
+			std::vector<Vertex> vertices{};
+			std::vector<Face> faces{};
 		};
 	}
 }

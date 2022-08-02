@@ -5,6 +5,7 @@
 #include "Log.h"
 #include "Window.h"
 #include "../Math/VectorTransform.h"
+#include "../Graphics/MeshImporter.h"
 
 namespace Q3D
 {

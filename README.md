@@ -4,5 +4,6 @@ Current library/framework dependencies are:
 * eigen3
 * fmt
 * spdlog
+* assimp
 
 ![Q3D Spinning Cube](https://user-images.githubusercontent.com/40324586/182043808-1303c1ab-8a0a-4602-989c-164cdbc753da.gif)

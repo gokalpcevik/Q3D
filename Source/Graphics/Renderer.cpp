@@ -102,12 +102,12 @@ namespace Q3D
 
 		void Renderer::DrawMesh(const Mesh& mesh,const Vector3f& cameraPos, uint32_t color) const
 		{
-			for(size_t i = 0; i < mesh.m_Faces.size(); ++i)
+			for(size_t i = 0; i < mesh.faces.size(); ++i)
 			{
-				Face const& face = mesh.m_Faces[i];
-				Vector3f v0 = mesh.m_Vertices[face.i0 - 1].Position;
-				Vector3f v1 = mesh.m_Vertices[face.i1 - 1].Position;
-				Vector3f v2 = mesh.m_Vertices[face.i2 - 1].Position;
+				Face const& face = mesh.faces[i];
+				Vector3f v0 = mesh.vertices[face.i0].Position;
+				Vector3f v1 = mesh.vertices[face.i1].Position;
+				Vector3f v2 = mesh.vertices[face.i2].Position;
 
 				v0 -= cameraPos;
 				v1 -= cameraPos;

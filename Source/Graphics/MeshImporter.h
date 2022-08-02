@@ -20,6 +20,7 @@ namespace Q3D
 		MeshImporter(std::filesystem::path path);
 		[[nodiscard]] bool Success() const;
 
+		void Move(std::vector<Graphics::Vertex>& vertices,std::vector<Graphics::Face>& faces);
 	private:
 		std::filesystem::path m_Path{};
 		std::vector<Graphics::Vertex> m_Vertices{};

@@ -23,18 +23,25 @@ namespace Q3D
 
 		for(size_t i = 0; i < pMesh->mNumVertices; ++i)
 		{
-			m_Vertices[i].Position = *reinterpret_cast<Vector3f*>(&pMesh->mVertices[i]);
+			m_Vertices.emplace_back(Graphics::Vertex{ *(Vector3f*)&pMesh->mVertices[i] });
+			
 		}
 
 		for(size_t i = 0; i < pMesh->mNumFaces; ++i)
 		{
 			auto const& face = pMesh->mFaces[i];
-			m_Faces[i] = { face.mIndices[0],face.mIndices[1],face.mIndices[2] };
+			m_Faces.emplace_back(Graphics::Face{ face.mIndices[0],face.mIndices[1],face.mIndices[2] });
 		}
 	}
 
 	bool MeshImporter::Success() const
 	{
 		return m_Success;
+	}
+
+	void MeshImporter::Move(std::vector<Graphics::Vertex>& vertices, std::vector<Graphics::Face>& faces)
+	{
+		vertices = std::move(m_Vertices);
+		faces = std::move(m_Faces);
 	}
 }

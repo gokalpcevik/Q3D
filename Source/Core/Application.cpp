@@ -45,31 +45,35 @@ namespace Q3D
 			if (!m_Window->CreateRenderer(SDL_RENDERER_PRESENTVSYNC))
 				return 0;
 
-			m_MeshVertices.emplace_back(Graphics::Vertex{ Vector3f{-1.0f, -1.0f, -1.0f }});
-			m_MeshVertices.emplace_back(Graphics::Vertex{ Vector3f{-1.0f,  1.0f, -1.0f }});
-			m_MeshVertices.emplace_back(Graphics::Vertex{ Vector3f{ 1.0f,  1.0f, -1.0f }});
-			m_MeshVertices.emplace_back(Graphics::Vertex{ Vector3f{ 1.0f, -1.0f, -1.0f }});
-			m_MeshVertices.emplace_back(Graphics::Vertex{ Vector3f{ 1.0f,  1.0f,  1.0f }});
-			m_MeshVertices.emplace_back(Graphics::Vertex{ Vector3f{ 1.0f, -1.0f,  1.0f }});
-			m_MeshVertices.emplace_back(Graphics::Vertex{ Vector3f{-1.0f,  1.0f,  1.0f }});
-			m_MeshVertices.emplace_back(Graphics::Vertex{ Vector3f{-1.0f, -1.0f,  1.0f }});
+			// We don't need these but leaving them on just as an example as to how to construct
+			// a mesh by specifying points explicitly like below.
+			//m_MeshVertices.emplace_back(Graphics::Vertex{ Vector3f{-1.0f, -1.0f, -1.0f }});
+			//m_MeshVertices.emplace_back(Graphics::Vertex{ Vector3f{-1.0f,  1.0f, -1.0f }});
+			//m_MeshVertices.emplace_back(Graphics::Vertex{ Vector3f{ 1.0f,  1.0f, -1.0f }});
+			//m_MeshVertices.emplace_back(Graphics::Vertex{ Vector3f{ 1.0f, -1.0f, -1.0f }});
+			//m_MeshVertices.emplace_back(Graphics::Vertex{ Vector3f{ 1.0f,  1.0f,  1.0f }});
+			//m_MeshVertices.emplace_back(Graphics::Vertex{ Vector3f{ 1.0f, -1.0f,  1.0f }});
+			//m_MeshVertices.emplace_back(Graphics::Vertex{ Vector3f{-1.0f,  1.0f,  1.0f }});
+			//m_MeshVertices.emplace_back(Graphics::Vertex{ Vector3f{-1.0f, -1.0f,  1.0f }});
+			//
+			//m_MeshFaces.emplace_back(Graphics::Face{ 1, 2, 3 });
+			//m_MeshFaces.emplace_back(Graphics::Face{ 1, 3, 4 });
+			//m_MeshFaces.emplace_back(Graphics::Face{ 4, 3, 5 });
+			//m_MeshFaces.emplace_back(Graphics::Face{ 4, 5, 6 });
+			//m_MeshFaces.emplace_back(Graphics::Face{ 6, 5, 7 });
+			//m_MeshFaces.emplace_back(Graphics::Face{ 6, 7, 8 });
+			//m_MeshFaces.emplace_back(Graphics::Face{ 8, 7, 2 });
+			//m_MeshFaces.emplace_back(Graphics::Face{ 8, 2, 1 });
+			//m_MeshFaces.emplace_back(Graphics::Face{ 2, 7, 5 });
+			//m_MeshFaces.emplace_back(Graphics::Face{ 2, 5, 3 });
+			//m_MeshFaces.emplace_back(Graphics::Face{ 6, 8, 1 });
+			//m_MeshFaces.emplace_back(Graphics::Face{ 6, 1, 4 });
+			//
+			//m_Cube.vertices = std::move(m_MeshVertices);
+			//m_Cube.faces = std::move(m_MeshFaces);
 
-
-			m_MeshFaces.emplace_back(Graphics::Face{ 1, 2, 3 });
-			m_MeshFaces.emplace_back(Graphics::Face{ 1, 3, 4 });
-			m_MeshFaces.emplace_back(Graphics::Face{ 4, 3, 5 });
-			m_MeshFaces.emplace_back(Graphics::Face{ 4, 5, 6 });
-			m_MeshFaces.emplace_back(Graphics::Face{ 6, 5, 7 });
-			m_MeshFaces.emplace_back(Graphics::Face{ 6, 7, 8 });
-			m_MeshFaces.emplace_back(Graphics::Face{ 8, 7, 2 });
-			m_MeshFaces.emplace_back(Graphics::Face{ 8, 2, 1 });
-			m_MeshFaces.emplace_back(Graphics::Face{ 2, 7, 5 });
-			m_MeshFaces.emplace_back(Graphics::Face{ 2, 5, 3 });
-			m_MeshFaces.emplace_back(Graphics::Face{ 6, 8, 1 });
-			m_MeshFaces.emplace_back(Graphics::Face{ 6, 1, 4 });
-
-			m_Cube.m_Vertices = std::move(m_MeshVertices);
-			m_Cube.m_Faces = std::move(m_MeshFaces);
+			MeshImporter importer("Assets/monkey.obj");
+			importer.Move(m_Cube.vertices,m_Cube.faces);
 
 			return Update();
 		}
