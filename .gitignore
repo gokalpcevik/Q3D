@@ -16,6 +16,7 @@
 # Mono auto generated files
 mono_crash.*
 
+
 # Build results
 Source/out/*
 [Dd]ebug/
@@ -397,3 +398,4 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+!Assets/*.obj
