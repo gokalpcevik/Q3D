@@ -21,10 +21,10 @@ namespace Q3D
 		m_Vertices.reserve(pMesh->mNumVertices);
 		m_Faces.reserve(pMesh->mNumFaces);
 
+
 		for(size_t i = 0; i < pMesh->mNumVertices; ++i)
 		{
-			m_Vertices.emplace_back(Graphics::Vertex{ *(Vector3f*)&pMesh->mVertices[i] });
-			
+			m_Vertices.emplace_back(Graphics::Vertex{ *(Vector3f*)&pMesh->mVertices[i],*(Vector3f*)&pMesh->mNormals[i] });
 		}
 
 		for(size_t i = 0; i < pMesh->mNumFaces; ++i)
@@ -43,5 +43,11 @@ namespace Q3D
 	{
 		vertices = std::move(m_Vertices);
 		faces = std::move(m_Faces);
+	}
+
+	void MeshImporter::Copy(std::vector<Graphics::Vertex>& vertices, std::vector<Graphics::Face>& faces) const
+	{
+		vertices = m_Vertices;
+		faces = m_Faces;
 	}
 }

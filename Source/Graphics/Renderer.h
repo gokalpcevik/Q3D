@@ -3,6 +3,7 @@
 #include <Eigen/Eigen>
 #include <cstdint>
 #include "Types.h"
+#include "../Math/VectorTransform.h"
 
 namespace Q3D
 {
@@ -42,17 +43,25 @@ namespace Q3D
 			void DrawTriangle(const Vector2f& v0, const Vector2f& v1, const Vector2f& v2,uint32_t color) const;
 			void DrawMesh(const Mesh& mesh,const Vector3f& cameraPos,uint32_t color) const;
 			void DrawLine(uint32_t x0, uint32_t y0, uint32_t x1, uint32_t y1, uint32_t color) const;
+			void SetCameraPosition(const Vector3f& pos);
+			void SetBackfaceCullingEnabled(bool enabled);
+			void ToggleBackfaceCullingEnabled();
 			void Shutdown() const;
 
 			static auto Project(const Vector3f& pos)->Vector2f;
+			static auto Cull(const Vector3f& cameraDir, const Vector3f& normal) -> bool;
 		private:
 			Core::Window* m_Window{ nullptr };
 			SDL_Renderer* m_Renderer{ nullptr };
 			uint32_t* m_ColorBuffer{ nullptr };
 			SDL_Texture* m_ColorBufferTexture{ nullptr };
 
-			uint32_t m_WindowWidth = 1920;
-			uint32_t m_WindowHeight = 1080;
+			uint32_t m_WindowWidth = 1920U;
+			uint32_t m_WindowHeight = 1080U;
+
+			Vector3f m_CameraPosition = { 0.0f,0.0f,0.0f };
+
+			bool m_BackfaceCullingEnabled = true;
 
 			friend class Window;
 		};

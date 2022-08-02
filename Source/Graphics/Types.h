@@ -22,11 +22,7 @@ namespace Q3D
 		struct Vertex
 		{
 			Vector3f Position{ 0.0f,0.0f,0.0f };
-
-			float operator[](size_t i) const
-			{
-				return Position[i];
-			}
+			Vector3f Normal{ 0.0f,0.0f,0.0f };
 		};
 
 		struct Rectangle
@@ -36,13 +32,16 @@ namespace Q3D
 
 		struct Triangle
 		{
-			std::array<Vector2f, 3ULL> points{};
+			std::array<Vector2f, 3ULL> Points{};
 		};
 
 		struct Mesh
 		{
-			std::vector<Vertex> vertices{};
-			std::vector<Face> faces{};
+			std::vector<Vertex> Vertices{};
+			std::vector<Face> Faces{};
+			Vector3f Translation{ 0.0f,0.0f,0.0f };
+			//Euler angles for now
+			Vector3f Rotation{ 0.0f,0.0f,0.0f };
 		};
 	}
 }

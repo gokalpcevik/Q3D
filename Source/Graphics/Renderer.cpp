@@ -102,16 +102,50 @@ namespace Q3D
 
 		void Renderer::DrawMesh(const Mesh& mesh,const Vector3f& cameraPos, uint32_t color) const
 		{
-			for(size_t i = 0; i < mesh.faces.size(); ++i)
+			for(size_t i = 0; i < mesh.Faces.size(); ++i)
 			{
-				Face const& face = mesh.faces[i];
-				Vector3f v0 = mesh.vertices[face.i0].Position;
-				Vector3f v1 = mesh.vertices[face.i1].Position;
-				Vector3f v2 = mesh.vertices[face.i2].Position;
+				Face const& face = mesh.Faces[i];
+				Vector3f v0 = mesh.Vertices[face.i0].Position;
+				Vector3f v1 = mesh.Vertices[face.i1].Position;
+				Vector3f v2 = mesh.Vertices[face.i2].Position;
+				Vector3f vNormal = mesh.Vertices[face.i0].Normal;
 
-				v0 -= cameraPos;
-				v1 -= cameraPos;
-				v2 -= cameraPos;
+				// Rotates use std::sinf and std::cosf so they are really expensive
+				// so we should probably avoid them if they are 0 
+
+				if (mesh.Rotation[0] != 0.0f)
+				{
+					v0 = Math::RotateX(v0, mesh.Rotation[0]);
+					v1 = Math::RotateX(v1, mesh.Rotation[0]);
+					v2 = Math::RotateX(v2, mesh.Rotation[0]);
+					vNormal = Math::RotateX(vNormal, mesh.Rotation[0]);
+				}
+				if (mesh.Rotation[1] != 0.0f)
+				{
+					v0 = Math::RotateY(v0, mesh.Rotation[1]);
+					v1 = Math::RotateY(v1, mesh.Rotation[1]);
+					v2 = Math::RotateY(v2, mesh.Rotation[1]);
+					vNormal = Math::RotateY(vNormal, mesh.Rotation[1]);
+				}
+				if (mesh.Rotation[2] != 0.0f)
+				{
+					v0 = Math::RotateZ(v0, mesh.Rotation[2]);
+					v1 = Math::RotateZ(v1, mesh.Rotation[2]);
+					v2 = Math::RotateZ(v2, mesh.Rotation[2]);
+					vNormal = Math::RotateZ(vNormal, mesh.Rotation[2]);
+				}
+	
+				v0 += mesh.Translation;
+				v1 += mesh.Translation;
+				v2 += mesh.Translation;
+
+				Vector3f cameraDirection = (m_CameraPosition - v0).normalized();
+
+				if(m_BackfaceCullingEnabled)
+				{
+					if (cameraDirection.dot(vNormal) <= 0.0f)
+						continue;
+				}
 
 				Vector2f p0 = Project(v0);
 				Vector2f p1 = Project(v1);
@@ -150,6 +184,21 @@ namespace Q3D
 			}
 		}
 
+		void Renderer::SetCameraPosition(const Vector3f& pos)
+		{
+			m_CameraPosition = pos;
+		}
+
+		void Renderer::SetBackfaceCullingEnabled(bool enabled)
+		{
+			m_BackfaceCullingEnabled = enabled;
+		}
+
+		void Renderer::ToggleBackfaceCullingEnabled()
+		{
+			m_BackfaceCullingEnabled = !m_BackfaceCullingEnabled;
+		}
+
 		void Renderer::Shutdown() const
 		{
 			delete[] m_ColorBuffer;
@@ -161,6 +210,11 @@ namespace Q3D
 		{
 			// This is essentially a very hacky way of doing perspective
 			return Vector2f{ pos[0] * 640.0f / pos[2] , pos[1] * 640.0f / pos[2]};
+		}
+
+		auto Renderer::Cull(const Vector3f& cameraDir, const Vector3f& normal) -> bool
+		{
+			return cameraDir.dot(normal) <= 0.0f;
 		}
 
 		auto Renderer::GetSDLRenderer() const -> SDL_Renderer*

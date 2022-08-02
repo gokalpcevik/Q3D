@@ -72,9 +72,9 @@ namespace Q3D
 			//m_Cube.vertices = std::move(m_MeshVertices);
 			//m_Cube.faces = std::move(m_MeshFaces);
 
-			MeshImporter importer("Assets/monkey.obj");
-			importer.Move(m_Cube.vertices,m_Cube.faces);
-
+			MeshImporter importer("Assets/sphere.obj");
+			importer.Move(m_Cube.Vertices,m_Cube.Faces);
+			m_Cube.Translation += Vector3f{0.0f, 0.0f, 2.0f};
 			return Update();
 		}
 
@@ -120,12 +120,22 @@ namespace Q3D
 							Q3D_INFO("Frame Time: {0:.2f}ms", m_Stats.GetFrameTime());
 							break;
 						}
+						if (m_Window->GetEvent().key.keysym.sym == SDLK_F2)
+						{
+							GetRenderer()->ToggleBackfaceCullingEnabled();
+							break;
+						}
 					}
 					}
 				}
 				GetRenderer()->ClearColorBuffer_Black();
 				//-------------------------------------------------
-				GetRenderer()->DrawMesh(m_Cube, { 0.0f,0.0f,4.0f },0xFFFF0000);
+				static float rotY = 0.0f;
+
+				rotY += 0.005f;
+				m_Cube.Rotation = { 0.0f,rotY,0.0f };
+
+				GetRenderer()->DrawMesh(m_Cube, { 0.0f,0.0f,2.2f },0xFFFFFFFF);
 				//-------------------------------------------------
 				GetRenderer()->UpdateColorBuffer();
 				GetRenderer()->CopyColorBuffer();
