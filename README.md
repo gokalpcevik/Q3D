@@ -13,4 +13,4 @@ Controls:
 * F3 - Toggle between cull modes (CullBack, CullNone)
 * F4 - Toggle mesh normals visualization
 
-![Q3D Spinning Cube](https://user-images.githubusercontent.com/40324586/182043808-1303c1ab-8a0a-4602-989c-164cdbc753da.gif)
+![Q3D_Sphere](https://user-images.githubusercontent.com/40324586/183299075-446a3997-c8b6-41b6-89e8-0e32997c3040.gif)
