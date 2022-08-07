@@ -30,19 +30,19 @@ namespace Q3D
 			Log::Init();
 			SDL_DisplayMode disp{};
 			SDL_GetDisplayMode(0, 0, &disp);
-			m_WindowW = 1600U;
-			m_WindowH = 900U;
+			m_WindowW = 800;
+			m_WindowH = 600;
 			m_Window = std::make_unique<Window>(
 				SDL_WINDOWPOS_CENTERED,
 				SDL_WINDOWPOS_CENTERED,
 				m_WindowW,
 				m_WindowH,
-				"Q3D Graphics",
+				"Software Renderer",
 				0
 				);
 			if (m_Window->IsNull())
 				return 0;
-			if (!m_Window->CreateRenderer(SDL_RENDERER_PRESENTVSYNC))
+			if (!m_Window->CreateRenderer(0))
 				return 0;
 
 			// We don't need these but leaving them on just as an example as to how to construct
@@ -74,7 +74,7 @@ namespace Q3D
 
 			MeshImporter importer("Assets/sphere.obj");
 			importer.Move(m_Cube.Vertices,m_Cube.Faces);
-			m_Cube.Translation += Vector3f{0.0f, 0.0f, 2.0f};
+			m_Cube.Translation += Vector3f{0.0f, 0.0f, 3.0f};
 			return Update();
 		}
 
@@ -118,11 +118,48 @@ namespace Q3D
 						{
 							Q3D_INFO("FPS: {0:.2f}", m_Stats.GetFramesPerSecond());
 							Q3D_INFO("Frame Time: {0:.2f}ms", m_Stats.GetFrameTime());
-							break;
 						}
 						if (m_Window->GetEvent().key.keysym.sym == SDLK_F2)
 						{
-							GetRenderer()->ToggleBackfaceCullingEnabled();
+							switch (GetRenderer()->GetRenderMode())
+							{
+								case Graphics::RenderMode::FillAndWireframe:
+								{
+									GetRenderer()->SetRenderMode(Graphics::RenderMode::Fill);
+									break;
+								}
+
+								case Graphics::RenderMode::Fill:
+								{
+									GetRenderer()->SetRenderMode(Graphics::RenderMode::Wireframe);
+									break;
+								}
+								case Graphics::RenderMode::Wireframe:
+								{
+									GetRenderer()->SetRenderMode(Graphics::RenderMode::FillAndWireframe);
+									break;
+								}
+							}
+						}
+						if (m_Window->GetEvent().key.keysym.sym == SDLK_F3)
+						{
+							switch (GetRenderer()->GetCullMode())
+							{
+								case Graphics::CullMode::CullBack:
+								{
+									GetRenderer()->SetCullMode(Graphics::CullMode::CullNone);
+									break;
+								}
+								case Graphics::CullMode::CullNone:
+								{
+									GetRenderer()->SetCullMode(Graphics::CullMode::CullBack);
+									break;
+								}
+							}
+						}
+						if (m_Window->GetEvent().key.keysym.sym == SDLK_F4)
+						{
+							GetRenderer()->ToggleNormalVisualization();
 							break;
 						}
 					}
@@ -130,12 +167,13 @@ namespace Q3D
 				}
 				GetRenderer()->ClearColorBuffer_Black();
 				//-------------------------------------------------
-				static float rotY = 0.0f;
+				static float rot = 0.0f;
+				rot += 0.0008f * m_Stats.GetFrameTime();
+				if (rot >= 100.0f)
+					rot = 0.0f;
+				m_Cube.Rotation = { rot,rot,rot};
 
-				rotY += 0.005f;
-				m_Cube.Rotation = { 0.0f,rotY,0.0f };
-
-				GetRenderer()->DrawMesh(m_Cube, { 0.0f,0.0f,2.2f },0xFFFFFFFF);
+				GetRenderer()->DrawMesh(m_Cube,0xFF0000FF);
 				//-------------------------------------------------
 				GetRenderer()->UpdateColorBuffer();
 				GetRenderer()->CopyColorBuffer();

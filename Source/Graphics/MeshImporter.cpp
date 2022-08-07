@@ -24,7 +24,9 @@ namespace Q3D
 
 		for(size_t i = 0; i < pMesh->mNumVertices; ++i)
 		{
-			m_Vertices.emplace_back(Graphics::Vertex{ *(Vector3f*)&pMesh->mVertices[i],*(Vector3f*)&pMesh->mNormals[i] });
+			m_Vertices.emplace_back(
+				Graphics::Vertex{ *(Vector3f*)&pMesh->mVertices[i]
+					,*(Vector3f*)&pMesh->mNormals[i] });
 		}
 
 		for(size_t i = 0; i < pMesh->mNumFaces; ++i)

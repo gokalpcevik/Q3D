@@ -16,6 +16,20 @@ namespace Q3D
 	{
 		using Eigen::Vector3f;
 		using Eigen::Vector2f;
+		using Eigen::Vector2i;
+
+		enum class RenderMode : uint8_t
+		{
+			Fill = 0,
+			Wireframe = 1,
+			FillAndWireframe = 2
+		};
+
+		enum class CullMode : uint8_t
+		{
+			CullNone = 0,
+			CullBack = 1
+		};
 
 		class Renderer
 		{
@@ -40,16 +54,22 @@ namespace Q3D
 			void DrawPixel(uint32_t index, uint32_t color) const;
 			void DrawPixel(uint32_t x, uint32_t y, uint32_t color) const;
 			void DrawRectangle(const Rectangle& rect) const;
-			void DrawTriangle(const Vector2f& v0, const Vector2f& v1, const Vector2f& v2,uint32_t color) const;
-			void DrawMesh(const Mesh& mesh,const Vector3f& cameraPos,uint32_t color) const;
+			void DrawTriangle(Vector2i v0, Vector2i v1, Vector2i v2, uint32_t color) const;
+			void DrawTriangleFilled(Vector2i v0, Vector2i v1, Vector2i v2, uint32_t color) const;
+			void FillFlatBottom(Vector2i v0, Vector2i v1, Vector2i v2, uint32_t color) const;
+			void FillFlatTop(Vector2i v0, Vector2i v1, Vector2i v2,uint32_t color) const;
+			void DrawMesh(const Mesh& mesh,uint32_t color) const;
 			void DrawLine(uint32_t x0, uint32_t y0, uint32_t x1, uint32_t y1, uint32_t color) const;
 			void SetCameraPosition(const Vector3f& pos);
-			void SetBackfaceCullingEnabled(bool enabled);
-			void ToggleBackfaceCullingEnabled();
+			void SetRenderMode(RenderMode rm);
+			void SetCullMode(CullMode cm);
+			void ToggleNormalVisualization();
 			void Shutdown() const;
 
+			auto GetRenderMode() const->RenderMode;
+			auto GetCullMode() const->CullMode;
+
 			static auto Project(const Vector3f& pos)->Vector2f;
-			static auto Cull(const Vector3f& cameraDir, const Vector3f& normal) -> bool;
 		private:
 			Core::Window* m_Window{ nullptr };
 			SDL_Renderer* m_Renderer{ nullptr };
@@ -61,7 +81,9 @@ namespace Q3D
 
 			Vector3f m_CameraPosition = { 0.0f,0.0f,0.0f };
 
-			bool m_BackfaceCullingEnabled = true;
+			RenderMode m_RenderMode{ RenderMode::FillAndWireframe };
+			CullMode m_CullMode{ CullMode::CullBack };
+			bool m_NormalVizEnabled = false;
 
 			friend class Window;
 		};

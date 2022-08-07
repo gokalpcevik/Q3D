@@ -93,14 +93,58 @@ namespace Q3D
 			}
 		}
 
-		void Renderer::DrawTriangle(const Vector2f& v0, const Vector2f& v1, const Vector2f& v2, uint32_t color) const
+		void Renderer::DrawTriangle(Vector2i v0, Vector2i v1, Vector2i v2, uint32_t color) const
 		{
 			DrawLine(v0[0], v0[1], v1[0], v1[1], color);
 			DrawLine(v1[0], v1[1], v2[0], v2[1], color);
 			DrawLine(v2[0], v2[1], v0[0], v0[1], color);
 		}
 
-		void Renderer::DrawMesh(const Mesh& mesh,const Vector3f& cameraPos, uint32_t color) const
+		void Renderer::DrawTriangleFilled(Vector2i v0, Vector2i v1, Vector2i v2, uint32_t color) const
+		{
+			if (v0[1] > v1[1])
+				v0.swap(v1);
+			if (v1[1] > v2[1])
+				v1.swap(v2);
+			if (v0[1] > v1[1])
+				v0.swap(v1);
+
+			int32_t Mx = (int32_t)(((float)v1[1] - v0[1]) * ((float)v2[0] - v0[0]) / ((float)v2[1] - v0[1])) + v0[0];
+			int32_t My = v1[1];
+			FillFlatBottom(v0, v1, { Mx,My }, color);
+			FillFlatTop(v1, { Mx,My }, v2, color);
+		}
+
+		void Renderer::FillFlatBottom(Vector2i v0, Vector2i v1, Vector2i v2, uint32_t color) const
+		{
+			float oneOverM1 = ((float)v1[0] - v0[0]) / ((float)v1[1] - v0[1]);
+			float oneOverM2 = ((float)v2[0] - v0[0]) / ((float)v2[1] - v0[1]);
+
+			float xStart = v0[0];
+			float xEnd = v0[0];
+
+			for(int32_t y = v0[1]; y <= v1[1]; ++y)
+			{
+				DrawLine((uint32_t)xStart, y, (uint32_t)xEnd, y, color);
+				xStart += oneOverM1;
+				xEnd += oneOverM2;
+			}
+		}
+
+		void Renderer::FillFlatTop(Vector2i v0, Vector2i v1, Vector2i v2, uint32_t color) const
+		{
+			float oneOverM1 = ((float)v2[0] - v0[0]) / (float)(v2[1] - v0[1]);
+			float oneOverM2 = ((float)v2[0] - v1[0]) / (float)(v2[1] - v1[1]);
+			float xStart = (float)v2[0];
+			float xEnd = (float)v2[0];
+			for (int32_t y = v2[1]; y >= v1[1]; y--) {
+				DrawLine((uint32_t)xStart, y, (uint32_t)xEnd, y, color);
+				xStart -= oneOverM1;
+				xEnd -= oneOverM2;
+			}
+		}
+
+		void Renderer::DrawMesh(const Mesh& mesh, uint32_t color) const
 		{
 			for(size_t i = 0; i < mesh.Faces.size(); ++i)
 			{
@@ -141,16 +185,19 @@ namespace Q3D
 
 				Vector3f cameraDirection = (m_CameraPosition - v0).normalized();
 
-				if(m_BackfaceCullingEnabled)
+				switch(m_CullMode)
 				{
-					if (cameraDirection.dot(vNormal) <= 0.0f)
-						continue;
+				case CullMode::CullBack:
+					{
+						if (cameraDirection.dot(vNormal) <= 0.0f)
+							continue;
+					}
+				case CullMode::CullNone: break;
 				}
 
 				Vector2f p0 = Project(v0);
 				Vector2f p1 = Project(v1);
 				Vector2f p2 = Project(v2);
-
 				p0[0] += (float)m_WindowWidth / 2.0f;
 				p0[1] += (float)m_WindowHeight / 2.0f;
 				p1[0] += (float)m_WindowWidth / 2.0f;
@@ -158,7 +205,43 @@ namespace Q3D
 				p2[0] += (float)m_WindowWidth / 2.0f;
 				p2[1] += (float)m_WindowHeight / 2.0f;
 
-				DrawTriangle(p0, p1, p2,color);
+				Vector2i pi0 = { std::lround(p0[0]),std::lround(p0[1]) };
+				Vector2i pi1 = { std::lround(p1[0]),std::lround(p1[1]) };
+				Vector2i pi2 = { std::lround(p2[0]),std::lround(p2[1]) };
+
+				switch(m_RenderMode)
+				{
+				case RenderMode::FillAndWireframe:
+					{
+						DrawTriangleFilled(pi0, pi1, pi2, color);
+						DrawTriangle(pi0, pi1, pi2, 0xFFFFFFFF);
+						break;
+					}
+
+				case RenderMode::Fill:
+					{
+						DrawTriangleFilled(pi0, pi1, pi2, color);
+						break;
+					}
+				case RenderMode::Wireframe:
+					{
+						DrawTriangle(pi0, pi1, pi2, 0xFFFFFFFF);
+						break;
+					}
+				}
+
+				if(m_NormalVizEnabled)
+				{
+					Vector3f n0 = v0 + vNormal / 5.0f;
+
+					Vector2f np0 = Project(n0);
+					np0[0] += (float)m_WindowWidth / 2.0f;
+					np0[1] += (float)m_WindowHeight / 2.0f;
+					
+					Vector2i npi0 = { std::lround(np0[0]),std::lround(np0[1]) };
+
+					DrawLine(pi0[0], pi0[1], npi0[0], npi0[1], 0xFFFF00FF);
+				}
 			}
 		}
 
@@ -170,15 +253,14 @@ namespace Q3D
 			uint32_t steps =
 				std::abs(dx) > std::abs(dy) ?
 				std::abs(dx) : std::abs(dy);
-
-			float Xinc = dx / (float)steps;
-			float Yinc = dy / (float)steps;
+			float Xinc = (float)dx / (float)steps;
+			float Yinc = (float)dy / (float)steps;
 			float x = (float)x0;
 			float y = (float)y0;
 
 			for (uint32_t i = 0; i <= steps; ++i)
 			{
-				DrawPixel(std::lround(x), std::lround(y), color);
+				DrawPixel(round(x), round(y), color);
 				x += Xinc;
 				y += Yinc;
 			}
@@ -189,14 +271,19 @@ namespace Q3D
 			m_CameraPosition = pos;
 		}
 
-		void Renderer::SetBackfaceCullingEnabled(bool enabled)
+		void Renderer::SetRenderMode(RenderMode rm)
 		{
-			m_BackfaceCullingEnabled = enabled;
+			m_RenderMode = rm;
 		}
 
-		void Renderer::ToggleBackfaceCullingEnabled()
+		void Renderer::SetCullMode(CullMode cm)
 		{
-			m_BackfaceCullingEnabled = !m_BackfaceCullingEnabled;
+			m_CullMode = cm;
+		}
+
+		void Renderer::ToggleNormalVisualization()
+		{
+			m_NormalVizEnabled = !m_NormalVizEnabled;
 		}
 
 		void Renderer::Shutdown() const
@@ -206,15 +293,20 @@ namespace Q3D
 			SDL_DestroyRenderer(m_Renderer);
 		}
 
+		auto Renderer::GetRenderMode() const -> RenderMode
+		{
+			return m_RenderMode;
+		}
+
+		auto Renderer::GetCullMode() const -> CullMode
+		{
+			return m_CullMode;
+		}
+
 		auto Renderer::Project(const Vector3f& pos) -> Vector2f
 		{
 			// This is essentially a very hacky way of doing perspective
 			return Vector2f{ pos[0] * 640.0f / pos[2] , pos[1] * 640.0f / pos[2]};
-		}
-
-		auto Renderer::Cull(const Vector3f& cameraDir, const Vector3f& normal) -> bool
-		{
-			return cameraDir.dot(normal) <= 0.0f;
 		}
 
 		auto Renderer::GetSDLRenderer() const -> SDL_Renderer*
