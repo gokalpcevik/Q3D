@@ -30,8 +30,8 @@ namespace Q3D
 			Log::Init();
 			SDL_DisplayMode disp{};
 			SDL_GetDisplayMode(0, 0, &disp);
-			m_WindowW = 800;
-			m_WindowH = 600;
+			m_WindowW = 1280;
+			m_WindowH = 720;
 			m_Window = std::make_unique<Window>(
 				SDL_WINDOWPOS_CENTERED,
 				SDL_WINDOWPOS_CENTERED,
@@ -172,8 +172,7 @@ namespace Q3D
 				if (rot >= 100.0f)
 					rot = 0.0f;
 				m_Cube.Rotation = { rot,rot,rot};
-
-				GetRenderer()->DrawMesh(m_Cube,0xFF0000FF);
+				GetRenderer()->DrawMesh(m_Cube,0xFFFF000F);
 				//-------------------------------------------------
 				GetRenderer()->UpdateColorBuffer();
 				GetRenderer()->CopyColorBuffer();
@@ -183,7 +182,5 @@ namespace Q3D
 			SDL_Quit();
 			return 0;
 		}
-
-		
 	}
 }

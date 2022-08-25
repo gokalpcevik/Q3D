@@ -33,6 +33,9 @@ namespace Q3D
 		struct Triangle
 		{
 			std::array<Vector2f, 3ULL> Points{};
+			// Non linearized avergae depth of the triangle
+			float AverageDepth = 0.5f;
+			uint32_t Color = 0xFFFFFFFF;
 		};
 
 		struct Mesh

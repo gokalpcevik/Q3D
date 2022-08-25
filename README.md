@@ -6,7 +6,6 @@ Current library/framework dependencies are:
 * spdlog
 * assimp
 
-You should copy the Source/Assets folder into the folder where the Q3D executable is before running.
 Controls:
 * F1 - Log Frametime and Frames Per Second into console
 * F2 - Toggle between render modes (FillAndWireframe, Fill, Wireframe)
