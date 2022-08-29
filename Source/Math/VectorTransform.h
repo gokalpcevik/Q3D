@@ -3,12 +3,14 @@
 
 namespace Q3D
 {
-	using Eigen::Vector3f;
+	using Eigen::Vector4f;
+	using Eigen::Matrix4f;
 
 	namespace Math
 	{
-		auto RotateZ(const Vector3f& pos, float rot)->Vector3f;
-		auto RotateY(const Vector3f& pos, float rot)->Vector3f;
-		auto RotateX(const Vector3f& pos, float rot)->Vector3f;
+		auto RotateZ(const Vector4f& pos, float rot)->Vector4f;
+		auto RotateY(const Vector4f& pos, float rot)->Vector4f;
+		auto RotateX(const Vector4f& pos, float rot)->Vector4f;
+		auto MatrixScale(float Sx,float Sy,float Sz)->Matrix4f;
 	}
 }

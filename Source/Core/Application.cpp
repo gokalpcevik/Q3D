@@ -30,8 +30,8 @@ namespace Q3D
 			Log::Init();
 			SDL_DisplayMode disp{};
 			SDL_GetDisplayMode(0, 0, &disp);
-			m_WindowW = 1280;
-			m_WindowH = 720;
+			m_WindowW = 640;
+			m_WindowH = 480;
 			m_Window = std::make_unique<Window>(
 				SDL_WINDOWPOS_CENTERED,
 				SDL_WINDOWPOS_CENTERED,
@@ -72,9 +72,10 @@ namespace Q3D
 			//m_Cube.vertices = std::move(m_MeshVertices);
 			//m_Cube.faces = std::move(m_MeshFaces);
 
-			MeshImporter importer("Assets/sphere.obj");
-			importer.Move(m_Cube.Vertices,m_Cube.Faces);
-			m_Cube.Translation += Vector3f{0.0f, 0.0f, 3.0f};
+			MeshImporter cubeImporter("Assets/sphere.obj");
+			MeshImporter sphereImporter("Assets/sphere.obj");
+			sphereImporter.Move(m_Sphere.Vertices,m_Sphere.Faces);
+			m_Sphere.Translation += Vector4f{0.0f, 0.0f, 4.5f,0.0f};
 			return Update();
 		}
 
@@ -171,9 +172,9 @@ namespace Q3D
 				rot += 0.0008f * m_Stats.GetFrameTime();
 				if (rot >= 100.0f)
 					rot = 0.0f;
-				m_Cube.Rotation = { rot,rot,rot};
-				GetRenderer()->DrawMesh(m_Cube,0xFFFF000F);
-				//-------------------------------------------------
+				m_Sphere.Rotation = { rot,rot,rot};
+				GetRenderer()->DrawMesh(m_Sphere,0xFFFF000F);
+					//-------------------------------------------------
 				GetRenderer()->UpdateColorBuffer();
 				GetRenderer()->CopyColorBuffer();
 				GetRenderer()->Present();

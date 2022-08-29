@@ -8,6 +8,7 @@ namespace Q3D
 {
 	namespace Graphics
 	{
+		using Eigen::Vector4f;
 		using Eigen::Vector3f;
 		using Eigen::Vector2f;
 		using Eigen::Vector3i;
@@ -21,8 +22,8 @@ namespace Q3D
 
 		struct Vertex
 		{
-			Vector3f Position{ 0.0f,0.0f,0.0f };
-			Vector3f Normal{ 0.0f,0.0f,0.0f };
+			Vector4f Position{ 0.0f,0.0f,0.0f,1.0f };
+			Vector4f Normal{ 0.0f,0.0f,0.0f,0.0f };
 		};
 
 		struct Rectangle
@@ -33,7 +34,7 @@ namespace Q3D
 		struct Triangle
 		{
 			std::array<Vector2f, 3ULL> Points{};
-			// Non linearized avergae depth of the triangle
+			// Non linearized average depth of the triangle
 			float AverageDepth = 0.5f;
 			uint32_t Color = 0xFFFFFFFF;
 		};
@@ -42,9 +43,10 @@ namespace Q3D
 		{
 			std::vector<Vertex> Vertices{};
 			std::vector<Face> Faces{};
-			Vector3f Translation{ 0.0f,0.0f,0.0f };
+			Vector4f Translation{ 0.0f,0.0f,0.0f,0.0f};
 			//Euler angles for now
 			Vector3f Rotation{ 0.0f,0.0f,0.0f };
+			//Vector3f Scale{1.0f,1.0f,1.0f};
 		};
 	}
 }

@@ -28,7 +28,7 @@ namespace Q3D
 													 SDL_TEXTUREACCESS_STREAMING,
 													 m_WindowWidth,
 													 m_WindowHeight);
-			m_RenderList.reserve(4096);
+			m_RenderList.reserve(RENDER_LIST_RESERVE_SIZE);
 		}
 
 		auto Renderer::IsNull() const -> bool
@@ -38,7 +38,7 @@ namespace Q3D
 
 		void Renderer::Clear(uint8_t R, uint8_t G, uint8_t B, uint8_t A) const
 		{
-			// TODO: Check for errors(0 on success, -1 on failure...)
+			// We don't actually call this function ever currently so no error checking is necessary.
 			SDL_SetRenderDrawColor(m_Renderer, R, G, B, A);
 			SDL_RenderClear(m_Renderer);
 		}
@@ -92,13 +92,11 @@ namespace Q3D
 
 		void Renderer::DrawRectangle(const Rectangle &rect) const
 		{
-			if ((m_WindowWidth <= rect.x + rect.width) || (m_WindowHeight <= rect.y + rect.height))
-				return;
 			for (size_t y = rect.y; y < rect.y + rect.height; y++)
 			{
 				for (size_t x = rect.x; x < rect.x + rect.width; x++)
 				{
-					m_ColorBuffer[m_WindowWidth * y + x] = rect.color;
+					this->DrawPixel(x,y,rect.color);
 				}
 			}
 		}
@@ -160,11 +158,10 @@ namespace Q3D
 			for (size_t i = 0; i < mesh.Faces.size(); ++i)
 			{
 				Face const &face = mesh.Faces[i];
-				Vector3f v0 = mesh.Vertices[face.i0].Position;
-				Vector3f v1 = mesh.Vertices[face.i1].Position;
-				Vector3f v2 = mesh.Vertices[face.i2].Position;
-				Vector3f vNormal = mesh.Vertices[face.i0].Normal;
-
+				Vector4f v0 = mesh.Vertices[face.i0].Position;
+				Vector4f v1 = mesh.Vertices[face.i1].Position;
+				Vector4f v2 = mesh.Vertices[face.i2].Position;
+				Vector4f vNormal = mesh.Vertices[face.i0].Normal;
 				// Rotates use std::sinf and std::cosf so they are really expensive
 				// so we should probably avoid them if they are 0
 
@@ -194,22 +191,24 @@ namespace Q3D
 				v1 += mesh.Translation;
 				v2 += mesh.Translation;
 
-				Vector3f cameraDirection = (m_CameraPosition - v0).normalized();
+				// Could also use a vec4f and set w = 0.0f and that would be more 'correct' and we 
+				// wouldn't need all these heads.
+				Vector3f cameraDirection = (m_CameraPosition - v0).normalized().head<3>();
 
 				switch (m_CullMode)
 				{
 				case CullMode::CullBack:
 				{
-					if (cameraDirection.dot(vNormal) <= 0.0f)
+					if (cameraDirection.dot(vNormal.head<3>()) <= 0.0f)
 						continue;
 				}
 				case CullMode::CullNone:
 					break;
 				}
 
-				Vector2f p0 = Project(v0);
-				Vector2f p1 = Project(v1);
-				Vector2f p2 = Project(v2);
+				Vector2f p0 = Math::ProjectPerspective(v0);
+				Vector2f p1 = Math::ProjectPerspective(v1);
+				Vector2f p2 = Math::ProjectPerspective(v2);
 				p0[0] += (float)m_WindowWidth / 2.0f;
 				p0[1] += (float)m_WindowHeight / 2.0f;
 				p1[0] += (float)m_WindowWidth / 2.0f;
@@ -222,14 +221,11 @@ namespace Q3D
 
 				if (m_NormalVizEnabled)
 				{
-					Vector3f n0 = v0 + vNormal / 5.0f;
-
-					Vector2f np0 = Project(n0);
+					Vector4f n0 = v0 + vNormal / 5.0f;
+					Vector2f np0 = Math::ProjectPerspective(n0);
 					np0[0] += (float)m_WindowWidth / 2.0f;
-					np0[1] += (float)m_WindowHeight / 2.0f;
-
+					np0	[1] += (float)m_WindowHeight / 2.0f;
 					Vector2i npi0 = {std::lround(np0[0]), std::lround(np0[1])};
-
 					DrawLine((uint32_t)p0[0], (uint32_t)p0[1], npi0[0], npi0[1], 0xFFFF00FF);
 				}
 			}
@@ -260,7 +256,7 @@ namespace Q3D
 			if(m_DepthSort == DepthSort::PaintersAlgorithm)
 			{
 				// Probably very expensive but no performance concerns for now
-				std::sort(m_RenderList.begin(),m_RenderList.end(),[&](const Triangle& first,const Triangle& second){ return first.AverageDepth > second.AverageDepth;});
+				std::sort(m_RenderList.begin(),m_RenderList.end(),[](const Triangle& first,const Triangle& second){ return first.AverageDepth >  second.AverageDepth;});
 			}
 
 			for (auto& triangle : m_RenderList)
@@ -295,10 +291,10 @@ namespace Q3D
 		void Renderer::Internal_Mesh_RenderList_Clear()
 		{
 			m_RenderList.clear();
-			m_RenderList.reserve(4096);
+			m_RenderList.reserve(RENDER_LIST_RESERVE_SIZE);
 		}
 
-		void Renderer::SetCameraPosition(const Vector3f &pos)
+		void Renderer::SetCameraPosition(const Vector4f &pos)
 		{
 			m_CameraPosition = pos;
 		}
@@ -338,12 +334,6 @@ namespace Q3D
 		auto Renderer::GetCullMode() const -> CullMode
 		{
 			return m_CullMode;
-		}
-
-		auto Renderer::Project(const Vector3f &pos) -> Vector2f
-		{
-			// This is essentially a very hacky way of doing perspective
-			return Vector2f{pos[0] * 640.0f / pos[2], pos[1] * 640.0f / pos[2]};
 		}
 
 		auto Renderer::GetSDLRenderer() const -> SDL_Renderer *

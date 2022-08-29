@@ -10,6 +10,7 @@
 
 namespace Q3D
 {
+	using Eigen::Vector4f;
 	using Eigen::Vector3f;
 	using Eigen::Vector2f;
 	using Eigen::Vector3i;

@@ -21,10 +21,11 @@ namespace Q3D
 			[[nodiscard]] auto GetFrameTimeSeconds()	const -> float;
 		};
 
-
+		using Eigen::Vector4f;
 		using Eigen::Vector3f;
 		using Eigen::Vector2f;
 		using Eigen::Vector3i;
+
 		class Application
 		{
 		public:
@@ -44,7 +45,7 @@ namespace Q3D
 
 			std::vector<Graphics::Vertex> m_MeshVertices{};
 			std::vector<Graphics::Face> m_MeshFaces{};
-			Graphics::Mesh m_Cube{};
+			Graphics::Mesh m_Sphere{};
 		};
 	}
 }
