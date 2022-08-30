@@ -44,7 +44,7 @@ namespace Q3D
 		using Eigen::Vector3f;
 		using Eigen::Vector4f;
 
-		uint32_t Color_RGBA(uint8_t A, uint8_t R, uint8_t G, uint8_t B);
+		uint32_t PackARGB(uint8_t A, uint8_t R, uint8_t G, uint8_t B);
 
 		enum class RenderMode : uint8_t
 		{

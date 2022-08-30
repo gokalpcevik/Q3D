@@ -1,11 +1,12 @@
-Not much content in this repo currently; although this will soon hopefully be a software based 3D graphics engine/renderer.
-Current library/framework dependencies are: 
+Q3D is a software based 3D Renderer/rasterizer.
+
 * SDL2
 * eigen3
 * fmt
 * spdlog
 * assimp
-* entt(on ecs branch)
+* entt
+
 
 Controls:
 * F1 - Log Frametime and Frames Per Second into console

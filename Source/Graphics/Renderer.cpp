@@ -5,7 +5,7 @@ namespace Q3D
 {
 	namespace Graphics
 	{
-		uint32_t Color_RGBA(uint8_t A, uint8_t R, uint8_t G, uint8_t B)
+		uint32_t PackARGB(uint8_t A, uint8_t R, uint8_t G, uint8_t B)
 		{
 			return ((uint32_t)A << 24) | ((uint32_t)R << 16) | ((uint32_t)G << 8) | (uint32_t)B;
 		}

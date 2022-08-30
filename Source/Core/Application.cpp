@@ -52,7 +52,7 @@ namespace Q3D
 			m_Sphere.GetComponent<ECS::TransformComponent>().Translation = {0.0f,0.0f,4.5f,0.0f };
 			auto& mc = m_Sphere.AddComponent<ECS::MeshComponent>();
 			mc.MeshAssetId = id;
-			mc.Color = 0xFF0F00FF;
+			mc.Color = Graphics::PackARGB(255, 255, 28, 128);
 			return Update();
 		}
 

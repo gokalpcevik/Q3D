@@ -43,7 +43,7 @@ namespace Q3D
             return std::filesystem::hash_value(path);
         }
 
-        MeshAssetContent& MeshLibrary::Retrieve(MeshAssetId id)
+        MeshAssetContent const& MeshLibrary::Retrieve(MeshAssetId id)
         {
             return s_MeshIdMap[id];
         }

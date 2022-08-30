@@ -35,7 +35,7 @@ namespace Q3D
             static void Remove(MeshAssetId id);
             static bool IsLoaded(MeshAssetId id);
             static MeshAssetId GetIdFromPath(const fls::path& path);
-            static MeshAssetContent& Retrieve(MeshAssetId id);
+            static MeshAssetContent const& Retrieve(MeshAssetId id);
             static MeshAssetContent&& Move(MeshAssetId id);
             static MeshAssetContent Copy(MeshAssetId id);
         private:
