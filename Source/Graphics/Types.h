@@ -28,7 +28,7 @@ namespace Q3D
 
 		struct Rectangle
 		{
-			uint32_t x, y, width, height, color;
+			uint32_t X, Y, Width, Height, Color;
 		};
 
 		struct Triangle
@@ -37,16 +37,6 @@ namespace Q3D
 			// Non linearized average depth of the triangle
 			float AverageDepth = 0.5f;
 			uint32_t Color = 0xFFFFFFFF;
-		};
-
-		struct Mesh
-		{
-			std::vector<Vertex> Vertices{};
-			std::vector<Face> Faces{};
-			Vector4f Translation{ 0.0f,0.0f,0.0f,0.0f};
-			//Euler angles for now
-			Vector3f Rotation{ 0.0f,0.0f,0.0f };
-			//Vector3f Scale{1.0f,1.0f,1.0f};
 		};
 	}
 }

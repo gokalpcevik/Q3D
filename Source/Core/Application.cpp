@@ -45,37 +45,14 @@ namespace Q3D
 			if (!m_Window->CreateRenderer(0))
 				return 0;
 
-			// We don't need these but leaving them on just as an example as to how to construct
-			// a mesh by specifying points explicitly like below.
-			//m_MeshVertices.emplace_back(Graphics::Vertex{ Vector3f{-1.0f, -1.0f, -1.0f }});
-			//m_MeshVertices.emplace_back(Graphics::Vertex{ Vector3f{-1.0f,  1.0f, -1.0f }});
-			//m_MeshVertices.emplace_back(Graphics::Vertex{ Vector3f{ 1.0f,  1.0f, -1.0f }});
-			//m_MeshVertices.emplace_back(Graphics::Vertex{ Vector3f{ 1.0f, -1.0f, -1.0f }});
-			//m_MeshVertices.emplace_back(Graphics::Vertex{ Vector3f{ 1.0f,  1.0f,  1.0f }});
-			//m_MeshVertices.emplace_back(Graphics::Vertex{ Vector3f{ 1.0f, -1.0f,  1.0f }});
-			//m_MeshVertices.emplace_back(Graphics::Vertex{ Vector3f{-1.0f,  1.0f,  1.0f }});
-			//m_MeshVertices.emplace_back(Graphics::Vertex{ Vector3f{-1.0f, -1.0f,  1.0f }});
-			//
-			//m_MeshFaces.emplace_back(Graphics::Face{ 1, 2, 3 });
-			//m_MeshFaces.emplace_back(Graphics::Face{ 1, 3, 4 });
-			//m_MeshFaces.emplace_back(Graphics::Face{ 4, 3, 5 });
-			//m_MeshFaces.emplace_back(Graphics::Face{ 4, 5, 6 });
-			//m_MeshFaces.emplace_back(Graphics::Face{ 6, 5, 7 });
-			//m_MeshFaces.emplace_back(Graphics::Face{ 6, 7, 8 });
-			//m_MeshFaces.emplace_back(Graphics::Face{ 8, 7, 2 });
-			//m_MeshFaces.emplace_back(Graphics::Face{ 8, 2, 1 });
-			//m_MeshFaces.emplace_back(Graphics::Face{ 2, 7, 5 });
-			//m_MeshFaces.emplace_back(Graphics::Face{ 2, 5, 3 });
-			//m_MeshFaces.emplace_back(Graphics::Face{ 6, 8, 1 });
-			//m_MeshFaces.emplace_back(Graphics::Face{ 6, 1, 4 });
-			//
-			//m_Cube.vertices = std::move(m_MeshVertices);
-			//m_Cube.faces = std::move(m_MeshFaces);
+			m_MainScene = std::make_unique<ECS::Scene>();
 
-			MeshImporter cubeImporter("Assets/sphere.obj");
-			MeshImporter sphereImporter("Assets/sphere.obj");
-			sphereImporter.Move(m_Sphere.Vertices,m_Sphere.Faces);
-			m_Sphere.Translation += Vector4f{0.0f, 0.0f, 4.5f,0.0f};
+			auto& [id, data] = AssetCore::MeshLibrary::Load("Assets/sphere.obj");
+			m_Sphere = m_MainScene->CreateEntity();
+			m_Sphere.GetComponent<ECS::TransformComponent>().Translation = {0.0f,0.0f,4.5f,0.0f };
+			auto& mc = m_Sphere.AddComponent<ECS::MeshComponent>();
+			mc.MeshAssetId = id;
+			mc.Color = 0xFF0F00FF;
 			return Update();
 		}
 
@@ -172,9 +149,11 @@ namespace Q3D
 				rot += 0.0008f * m_Stats.GetFrameTime();
 				if (rot >= 100.0f)
 					rot = 0.0f;
-				m_Sphere.Rotation = { rot,rot,rot};
-				GetRenderer()->DrawMesh(m_Sphere,0xFFFF000F);
-					//-------------------------------------------------
+				auto& tc = m_Sphere.GetComponent<ECS::TransformComponent>();
+				tc.Rotation = { rot,rot,rot };
+
+				m_MainScene->Draw(*GetRenderer());
+				//-------------------------------------------------
 				GetRenderer()->UpdateColorBuffer();
 				GetRenderer()->CopyColorBuffer();
 				GetRenderer()->Present();

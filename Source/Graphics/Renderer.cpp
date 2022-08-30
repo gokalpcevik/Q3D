@@ -66,7 +66,7 @@ namespace Q3D
 							  (m_WindowWidth * 4));
 		}
 
-		void Renderer::CopyColorBuffer()
+		void Renderer::CopyColorBuffer() const
 		{
 			SDL_RenderCopy(m_Renderer, m_ColorBufferTexture, nullptr, nullptr);
 		}
@@ -92,11 +92,11 @@ namespace Q3D
 
 		void Renderer::DrawRectangle(const Rectangle &rect) const
 		{
-			for (size_t y = rect.y; y < rect.y + rect.height; y++)
+			for (size_t y = rect.Y; y < rect.Y + rect.Height; y++)
 			{
-				for (size_t x = rect.x; x < rect.x + rect.width; x++)
+				for (size_t x = rect.X; x < rect.X + rect.Width; x++)
 				{
-					this->DrawPixel(x,y,rect.color);
+					this->DrawPixel(x, y, rect.Color);
 				}
 			}
 		}
@@ -153,45 +153,46 @@ namespace Q3D
 			}
 		}
 
-		void Renderer::DrawMesh(const Mesh &mesh, uint32_t color)
+		void Renderer::DrawMesh(const ECS::MeshComponent& mc, const ECS::TransformComponent& tc)
 		{
-			for (size_t i = 0; i < mesh.Faces.size(); ++i)
+			auto& [vertices, faces] = AssetCore::MeshLibrary::Retrieve(mc.MeshAssetId);
+
+			for (size_t i = 0; i < faces.size(); ++i)
 			{
-				Face const &face = mesh.Faces[i];
-				Vector4f v0 = mesh.Vertices[face.i0].Position;
-				Vector4f v1 = mesh.Vertices[face.i1].Position;
-				Vector4f v2 = mesh.Vertices[face.i2].Position;
-				Vector4f vNormal = mesh.Vertices[face.i0].Normal;
-				// Rotates use std::sinf and std::cosf so they are really expensive
-				// so we should probably avoid them if they are 0
+				Face const& face = faces[i];
+				Vector4f v0 = vertices[face.i0].Position;
+				Vector4f v1 = vertices[face.i1].Position;
+				Vector4f v2 = vertices[face.i2].Position;
+				Vector4f vNormal = vertices[face.i0].Normal;
 
-				if (mesh.Rotation[0] != 0.0f)
+				if (tc.Rotation[0] != 0.0f)
 				{
-					v0 = Math::RotateX(v0, mesh.Rotation[0]);
-					v1 = Math::RotateX(v1, mesh.Rotation[0]);
-					v2 = Math::RotateX(v2, mesh.Rotation[0]);
-					vNormal = Math::RotateX(vNormal, mesh.Rotation[0]);
+					v0 = Math::RotateX(v0, tc.Rotation[0]);
+					v1 = Math::RotateX(v1, tc.Rotation[0]);
+					v2 = Math::RotateX(v2, tc.Rotation[0]);
+					vNormal = Math::RotateX(vNormal, tc.Rotation[0]);
 				}
-				if (mesh.Rotation[1] != 0.0f)
+				if (tc.Rotation[1] != 0.0f)
 				{
-					v0 = Math::RotateY(v0, mesh.Rotation[1]);
-					v1 = Math::RotateY(v1, mesh.Rotation[1]);
-					v2 = Math::RotateY(v2, mesh.Rotation[1]);
-					vNormal = Math::RotateY(vNormal, mesh.Rotation[1]);
+					v0 = Math::RotateY(v0, tc.Rotation[1]);
+					v1 = Math::RotateY(v1, tc.Rotation[1]);
+					v2 = Math::RotateY(v2, tc.Rotation[1]);
+					vNormal = Math::RotateY(vNormal, tc.Rotation[1]);
 				}
-				if (mesh.Rotation[2] != 0.0f)
+				if (tc.Rotation[2] != 0.0f)
 				{
-					v0 = Math::RotateZ(v0, mesh.Rotation[2]);
-					v1 = Math::RotateZ(v1, mesh.Rotation[2]);
-					v2 = Math::RotateZ(v2, mesh.Rotation[2]);
-					vNormal = Math::RotateZ(vNormal, mesh.Rotation[2]);
+					v0 = Math::RotateZ(v0, tc.Rotation[2]);
+					v1 = Math::RotateZ(v1, tc.Rotation[2]);
+					v2 = Math::RotateZ(v2, tc.Rotation[2]);
+					vNormal = Math::RotateZ(vNormal, tc.Rotation[2]);
 				}
 
-				v0 += mesh.Translation;
-				v1 += mesh.Translation;
-				v2 += mesh.Translation;
 
-				// Could also use a vec4f and set w = 0.0f and that would be more 'correct' and we 
+				v0 += tc.Translation;
+				v1 += tc.Translation;
+				v2 += tc.Translation;
+
+				// Could also use a vec4f and set w = 0.0f and that would be more 'correct' and we
 				// wouldn't need all these heads.
 				Vector3f cameraDirection = (m_CameraPosition - v0).normalized().head<3>();
 
@@ -217,15 +218,15 @@ namespace Q3D
 				p2[1] += (float)m_WindowHeight / 2.0f;
 
 				float averageDepth = (v0[2] + v1[2] + v2[2]) / 3.0f;
-				m_RenderList.emplace_back(Triangle{{p0, p1, p2}, averageDepth, color});
+				m_RenderList.emplace_back(Triangle{ {p0, p1, p2}, averageDepth, mc.Color });
 
 				if (m_NormalVizEnabled)
 				{
 					Vector4f n0 = v0 + vNormal / 5.0f;
 					Vector2f np0 = Math::ProjectPerspective(n0);
 					np0[0] += (float)m_WindowWidth / 2.0f;
-					np0	[1] += (float)m_WindowHeight / 2.0f;
-					Vector2i npi0 = {std::lround(np0[0]), std::lround(np0[1])};
+					np0[1] += (float)m_WindowHeight / 2.0f;
+					Vector2i npi0 = { std::lround(np0[0]), std::lround(np0[1]) };
 					DrawLine((uint32_t)p0[0], (uint32_t)p0[1], npi0[0], npi0[1], 0xFFFF00FF);
 				}
 			}
@@ -253,13 +254,14 @@ namespace Q3D
 
 		void Renderer::Internal_Mesh_Draw()
 		{
-			if(m_DepthSort == DepthSort::PaintersAlgorithm)
+			if (m_DepthSort == DepthSort::PaintersAlgorithm)
 			{
 				// Probably very expensive but no performance concerns for now
-				std::sort(m_RenderList.begin(),m_RenderList.end(),[](const Triangle& first,const Triangle& second){ return first.AverageDepth >  second.AverageDepth;});
+				std::sort(m_RenderList.begin(), m_RenderList.end(), [](const Triangle &first, const Triangle &second)
+						  { return first.AverageDepth > second.AverageDepth; });
 			}
 
-			for (auto& triangle : m_RenderList)
+			for (auto &triangle : m_RenderList)
 			{
 				Vector2i pi0 = {std::lround(triangle.Points[0][0]), std::lround(triangle.Points[0][1])};
 				Vector2i pi1 = {std::lround(triangle.Points[1][0]), std::lround(triangle.Points[1][1])};

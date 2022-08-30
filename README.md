@@ -5,6 +5,7 @@ Current library/framework dependencies are:
 * fmt
 * spdlog
 * assimp
+* entt(on ecs branch)
 
 Controls:
 * F1 - Log Frametime and Frames Per Second into console
