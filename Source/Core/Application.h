@@ -5,7 +5,10 @@
 #include "Log.h"
 #include "Window.h"
 #include "../Math/VectorTransform.h"
-#include "../Graphics/MeshImporter.h"
+#include "../AssetCore/MeshLibrary.h"
+#include "../ECS/Scene.h"
+#include "../ECS/Entity.h"
+#include "../Utility/Random.h"
 
 namespace Q3D
 {
@@ -45,7 +48,10 @@ namespace Q3D
 
 			std::vector<Graphics::Vertex> m_MeshVertices{};
 			std::vector<Graphics::Face> m_MeshFaces{};
-			Graphics::Mesh m_Sphere{};
+
+			std::unique_ptr<ECS::Scene> m_MainScene;
+			ECS::Entity m_Sphere;
+			ECS::Entity m_Cube;
 		};
 	}
 }
