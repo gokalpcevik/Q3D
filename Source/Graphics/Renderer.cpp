@@ -187,10 +187,9 @@ namespace Q3D
 					vNormal = Math::RotateZ(vNormal, tc.Rotation[2]);
 				}
 
-
-				v0 += tc.Translation;
-				v1 += tc.Translation;
-				v2 += tc.Translation;
+				v0 = Math::Translate(tc.Translation) * v0;
+				v1 = Math::Translate(tc.Translation) * v1;
+				v2 = Math::Translate(tc.Translation) * v2;
 
 				// Could also use a vec4f and set w = 0.0f and that would be more 'correct' and we
 				// wouldn't need all these heads.

@@ -62,6 +62,7 @@ namespace Q3D
 		enum class DepthSort : uint8_t
 		{
 			None = 0,
+			// Implementation is not exactly painters algorithm but its close enough
 			PaintersAlgorithm
 		};
 
