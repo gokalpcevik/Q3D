@@ -1,4 +1,5 @@
 target_sources("Q3D" PRIVATE
 	"Application.cpp"
 	"Window.cpp"
-	"Log.cpp")
+	"Log.cpp"
+	"Input.cpp")
